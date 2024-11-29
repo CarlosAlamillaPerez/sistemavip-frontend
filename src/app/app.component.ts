@@ -27,4 +27,25 @@ export class AppComponent {
       }
     });
   }
+
+  test401Error(): void {
+    this.testService.testError('unauthorized').subscribe({
+      next: (response) => console.log('Success:', response),
+      error: (error) => console.error('Error 401:', error)
+    });
+  }
+
+  test404Error(): void {
+    this.testService.testError('notFound').subscribe({
+      next: (response) => console.log('Success:', response),
+      error: (error) => console.error('Error 404:', error)
+    });
+  }
+
+  test500Error(): void {
+    this.testService.testError('serverError').subscribe({
+      next: (response) => console.log('Success:', response),
+      error: (error) => console.error('Error 500:', error)
+    });
+  }
 }

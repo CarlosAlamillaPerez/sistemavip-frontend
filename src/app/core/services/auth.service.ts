@@ -1,13 +1,20 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap, map } from 'rxjs';
-import { environment } from '@env/environment'; // Actualizaremos esto con path alias
-import { User, UserRole } from '@core/interfaces/user.interface'; // Actualizaremos esto con path alias
-import { AlertService } from '@core/services/alert.service';// Actualizaremos esto con path alias
+import { environment } from '@env/environment';
+import { User, UserRole } from '@core/interfaces/user.interface';
+import { AlertService } from '@core/services/alert.service';
+
+interface LoginRequest {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+}
 
 interface LoginResponse {
-  token: string;
   user: User;
+  success: boolean;
+  message?: string;
 }
 
 @Injectable({
@@ -21,26 +28,64 @@ export class AuthService {
     private http: HttpClient,
     private alertService: AlertService
   ) {
-    this.checkToken();
+    this.checkAuthentication();
   }
 
+  login(email: string, password: string, rememberMe: boolean): Observable<LoginResponse> {
+    const loginData: LoginRequest = {
+      email,
+      password,
+      rememberMe
+    };
 
-  login(email: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, { email, password })
-      .pipe(
-        tap(response => {
-          localStorage.setItem('token', response.token);
-          this.currentUserSubject.next(response.user);
+    return this.http.post<LoginResponse>(
+      `${environment.apiUrl}/auth/login`, 
+      loginData,
+      {
+        withCredentials: true, // Importante para permitir cookies
+        observe: 'response' as const
+      }
+    ).pipe(
+      map((response: HttpResponse<LoginResponse>) => {
+        if (response.body) {
+          this.currentUserSubject.next(response.body.user);
           this.isAuthenticated.next(true);
           this.alertService.success('¡Bienvenido al Sistema VIP!');
-        })
-      );
+          return response.body;
+        }
+        throw new Error('Respuesta inválida del servidor');
+      })
+    );
   }
 
-  logout(): void {
-    localStorage.removeItem('token');
-    this.currentUserSubject.next(null);
-    this.isAuthenticated.next(false);
+  logout(): Observable<void> {
+    return this.http.post<void>(
+      `${environment.apiUrl}/auth/logout`,
+      {},
+      { withCredentials: true }
+    ).pipe(
+      tap(() => {
+        this.currentUserSubject.next(null);
+        this.isAuthenticated.next(false);
+      })
+    );
+  }
+
+  private checkAuthentication(): void {
+    // Verificar el estado de autenticación con el backend
+    this.http.get<User>(
+      `${environment.apiUrl}/auth/check`,
+      { withCredentials: true }
+    ).subscribe({
+      next: (user) => {
+        this.currentUserSubject.next(user);
+        this.isAuthenticated.next(true);
+      },
+      error: () => {
+        this.currentUserSubject.next(null);
+        this.isAuthenticated.next(false);
+      }
+    });
   }
 
   getCurrentUser(): Observable<User | null> {
@@ -49,18 +94,6 @@ export class AuthService {
 
   isAuthenticated$(): Observable<boolean> {
     return this.isAuthenticated.asObservable();
-  }
-
-  requestPasswordReset(email: string): Observable<void> {
-    return this.http.post<void>(`${environment.apiUrl}/auth/forgot-password`, { email });
-  }
-
-  private checkToken(): void {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // Aquí podríamos validar el token con el backend
-      this.isAuthenticated.next(true);
-    }
   }
 
   hasRole(role: UserRole): Observable<boolean> {
@@ -92,9 +125,4 @@ export class AuthService {
   isPresentador(): Observable<boolean> {
     return this.hasRole(UserRole.PRESENTADOR);
   }
-
-  
 }
-
-
-

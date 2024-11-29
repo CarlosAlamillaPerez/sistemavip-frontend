@@ -1,0 +1,83 @@
+<div class="container-fluid">
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Gestión de Personal</h2>
+      <button class="btn btn-primary">
+        Nuevo Personal
+      </button>
+    </div>
+  
+    <!-- Resumen -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="card border-info border-start border-4">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-info">Terapeutas Registrados</h6>
+            <h2 class="card-title mb-0">{{ resumenPersonal.totalTerapeutas }}</h2>
+          </div>
+        </div>
+      </div>
+  
+      <div class="col-md-6 col-lg-3">
+        <div class="card border-success border-start border-4">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-success">Terapeutas Activos</h6>
+            <h2 class="card-title mb-0">{{ resumenPersonal.terapeutasActivos }}</h2>
+          </div>
+        </div>
+      </div>
+  
+      <div class="col-md-6 col-lg-3">
+        <div class="card border-warning border-start border-4">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-warning">Presentadores Registrados</h6>
+            <h2 class="card-title mb-0">{{ resumenPersonal.totalPresentadores }}</h2>
+          </div>
+        </div>
+      </div>
+  
+      <div class="col-md-6 col-lg-3">
+        <div class="card border-primary border-start border-4">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-primary">Presentadores Activos</h6>
+            <h2 class="card-title mb-0">{{ resumenPersonal.presentadoresActivos }}</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Pestañas -->
+    <ul class="nav nav-tabs mb-4">
+      <li class="nav-item">
+        <a class="nav-link active" href="#">Terapeutas</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Presentadores</a>
+      </li>
+    </ul>
+  
+    <!-- Tabla de Personal -->
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="6" class="text-center text-muted">No hay registros para mostrar</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -7,3 +7,20 @@
   </div>
 </div>
 <router-outlet />
+
+<div class="container mt-3">
+  <div class="d-flex gap-2">
+      <button class="btn btn-primary" (click)="testLoadingIndicator()">
+          Test Loading (5s)
+      </button>
+      <button class="btn btn-warning" (click)="test401Error()">
+          Test 401 Error
+      </button>
+      <button class="btn btn-danger" (click)="test404Error()">
+          Test 404 Error
+      </button>
+      <button class="btn btn-dark" (click)="test500Error()">
+          Test 500 Error
+      </button>
+  </div>
+</div>

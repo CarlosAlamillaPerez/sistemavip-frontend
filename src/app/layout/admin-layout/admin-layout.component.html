@@ -1,19 +1,33 @@
 <div class="d-flex">
-    <!-- Sidebar -->
-    <nav class="bg-dark text-white sidebar">
-      <!-- Sidebar content will go here -->
-    </nav>
-  
-    <!-- Main content -->
-    <div class="flex-grow-1 main-content">
-      <!-- Header -->
-      <header class="bg-primary text-white p-3">
-        <!-- Header content will go here -->
-      </header>
-  
-      <!-- Page content -->
-      <main class="p-4">
-        <router-outlet />
-      </main>
+  <!-- Sidebar -->
+  <nav class="sidebar bg-dark text-white p-3">
+    <h5 class="mb-4">Sistema VIP</h5>
+    <div class="nav flex-column nav-pills">
+      <a class="nav-link text-white mb-2" 
+         routerLink="dashboard" 
+         routerLinkActive="active">
+        Dashboard
+      </a>
+      <a class="nav-link text-white mb-2" 
+         routerLink="personal" 
+         routerLinkActive="active">
+        Personal
+      </a>
+      <a class="nav-link text-white mb-2" 
+         routerLink="comisiones" 
+         routerLinkActive="active">
+        Comisiones
+      </a>
+      <a class="nav-link text-white mb-2" 
+         routerLink="reportes" 
+         routerLinkActive="active">
+        Reportes
+      </a>
     </div>
-  </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content p-4">
+    <router-outlet></router-outlet>
+  </main>
+</div>

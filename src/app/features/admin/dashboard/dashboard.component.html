@@ -1,0 +1,77 @@
+<div class="container-fluid">
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Dashboard</h2>
+      <div class="text-muted">
+        {{ today | date:'fullDate' }}
+      </div>
+    </div>
+  
+    <!-- KPIs -->
+    <div class="row g-4 mb-4">
+      <!-- Servicios -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-primary border-start border-4">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-primary">Servicios Activos</h6>
+            <h2 class="card-title mb-0">{{ kpis.serviciosActivos }}</h2>
+          </div>
+        </div>
+      </div>
+  
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-success border-start border-4">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-success">Servicios del Día</h6>
+            <h2 class="card-title mb-0">{{ kpis.serviciosHoy }}</h2>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Personal -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-info border-start border-4">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-info">Terapeutas Activos</h6>
+            <h2 class="card-title mb-0">{{ kpis.terapeutasActivos }}</h2>
+          </div>
+        </div>
+      </div>
+  
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-warning border-start border-4">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-warning">Presentadores Activos</h6>
+            <h2 class="card-title mb-0">{{ kpis.presentadoresActivos }}</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Secciones de Estado -->
+    <div class="row g-4">
+      <!-- Servicios Recientes -->
+      <div class="col-12 col-lg-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Servicios Recientes</h5>
+          </div>
+          <div class="card-body">
+            <p class="text-muted">No hay servicios recientes</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Comisiones Pendientes -->
+      <div class="col-12 col-lg-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Comisiones Pendientes</h5>
+          </div>
+          <div class="card-body">
+            <p class="text-muted">No hay comisiones pendientes</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

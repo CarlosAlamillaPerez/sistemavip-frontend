@@ -1,0 +1,21 @@
+.card {
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .border-start {
+    border-left-width: 4px !important;
+  }
+  
+  .table th {
+    font-weight: 500;
+    background-color: #f8f9fa;
+  }
+  
+  .form-label {
+    font-weight: 500;
+    font-size: 0.875rem;
+  }
