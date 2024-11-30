@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { AdminLayoutComponent } from '../../layout/admin-layout/admin-layout.component';
+import { RoleGuard } from '@core/guards/role.guard';
+import { UserRole } from '@core/interfaces/user.interface';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -12,7 +14,18 @@ export const ADMIN_ROUTES: Routes = [
       },
       {
         path: 'personal',
-        loadComponent: () => import('./personal/personal.component').then(m => m.PersonalComponent)
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./personal/personal.component').then(m => m.PersonalComponent)
+          },
+          {
+            path: 'presentadores',
+            loadChildren: () => import('./personal/presentadores/presentadores.routes')
+              .then(m => m.PRESENTADORES_ROUTES),
+            canActivate: [RoleGuard([UserRole.SUPER_ADMIN, UserRole.ADMIN])]
+          }
+        ]
       },
       {
         path: 'comisiones',

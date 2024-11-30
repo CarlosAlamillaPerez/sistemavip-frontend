@@ -5,39 +5,72 @@ import Swal from 'sweetalert2';
   providedIn: 'root'
 })
 export class AlertService {
-  success(message: string): void {
+  success(title: string, text: string, callback?: () => void): void {
     Swal.fire({
       icon: 'success',
-      title: '¡Éxito!',
-      text: message,
+      title,
+      text,
       confirmButtonColor: '#198754'
+    }).then(() => {
+      if (callback) callback();
     });
   }
 
-  error(message: string): void {
+  error(title: string, text: string, callback?: () => void): void {
     Swal.fire({
       icon: 'error',
-      title: '¡Error!',
-      text: message,
+      title,
+      text,
       confirmButtonColor: '#dc3545'
+    }).then(() => {
+      if (callback) callback();
     });
   }
 
-  confirm(options: {
-    title: string;
-    text: string;
-    confirmButtonText?: string;
-    cancelButtonText?: string;
-  }): Promise<boolean> {
-    return Swal.fire({
+  warning(title: string, text: string, callback?: () => void): void {
+    Swal.fire({
       icon: 'warning',
-      title: options.title,
-      text: options.text,
+      title,
+      text,
+      confirmButtonColor: '#ffc107'
+    }).then(() => {
+      if (callback) callback();
+    });
+  }
+
+  info(title: string, text: string, callback?: () => void): void {
+    Swal.fire({
+      icon: 'info',
+      title,
+      text,
+      confirmButtonColor: '#0dcaf0'
+    }).then(() => {
+      if (callback) callback();
+    });
+  }
+
+  confirm(
+    title: string, 
+    text: string, 
+    callback: () => void,
+    options: {
+      confirmButtonText?: string;
+      cancelButtonText?: string;
+    } = {}
+  ): void {
+    Swal.fire({
+      icon: 'warning',
+      title,
+      text,
       showCancelButton: true,
       confirmButtonColor: '#198754',
       cancelButtonColor: '#dc3545',
       confirmButtonText: options.confirmButtonText || 'Confirmar',
       cancelButtonText: options.cancelButtonText || 'Cancelar'
-    }).then(result => result.isConfirmed);
+    }).then(result => {
+      if (result.isConfirmed && callback) {
+        callback();
+      }
+    });
   }
 }
