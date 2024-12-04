@@ -50,7 +50,7 @@ export class AuthService {
         if (response.body) {
           this.currentUserSubject.next(response.body.user);
           this.isAuthenticated.next(true);
-          this.alertService.success('¡Bienvenido al Sistema VIP!');
+          this.alertService.success('¡Bienvenido al Sistema VIP!', 'Inicio de Sesión');
           return response.body;
         }
         throw new Error('Respuesta inválida del servidor');

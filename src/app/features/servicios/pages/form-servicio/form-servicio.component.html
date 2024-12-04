@@ -1,0 +1,148 @@
+<div class="container-fluid">
+    <div class="row mb-4">
+      <div class="col">
+        <h2>{{isEditing ? 'Editar' : 'Nuevo'}} Servicio</h2>
+      </div>
+    </div>
+  
+    <div class="card">
+      <div class="card-body">
+        <!-- Loading spinner -->
+        <div class="text-center py-5" *ngIf="loading">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+  
+        <!-- Formulario -->
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loading">
+          <div class="row">
+            <!-- Fecha de Servicio -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Fecha de Servicio *</label>
+              <input 
+                type="datetime-local" 
+                class="form-control"
+                formControlName="fechaServicio"
+                [ngClass]="{'is-invalid': form.get('fechaServicio')?.touched && form.get('fechaServicio')?.invalid}">
+              <div class="invalid-feedback" *ngIf="form.get('fechaServicio')?.errors?.['required']">
+                La fecha de servicio es requerida
+              </div>
+            </div>
+  
+            <!-- Tipo de Servicio -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Tipo de Servicio *</label>
+              <select 
+                class="form-select"
+                formControlName="tipoServicio"
+                [ngClass]="{'is-invalid': form.get('tipoServicio')?.touched && form.get('tipoServicio')?.invalid}">
+                <option value="">Seleccione...</option>
+                <option value="Consultorio">Consultorio</option>
+                <option value="Domicilio">Domicilio</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="form.get('tipoServicio')?.errors?.['required']">
+                El tipo de servicio es requerido
+              </div>
+            </div>
+  
+            <!-- Dirección -->
+            <div class="col-md-12 mb-3" *ngIf="form.get('tipoServicio')?.value === 'Domicilio'">
+              <label class="form-label">Dirección *</label>
+              <input 
+                type="text" 
+                class="form-control"
+                formControlName="direccion"
+                [ngClass]="{'is-invalid': form.get('direccion')?.touched && form.get('direccion')?.invalid}">
+            </div>
+  
+            <!-- Monto Total -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Monto Total *</label>
+              <input 
+                type="number" 
+                class="form-control"
+                formControlName="montoTotal"
+                [ngClass]="{'is-invalid': form.get('montoTotal')?.touched && form.get('montoTotal')?.invalid}">
+              <div class="invalid-feedback" *ngIf="form.get('montoTotal')?.errors?.['required']">
+                El monto total es requerido
+              </div>
+              <div class="invalid-feedback" *ngIf="form.get('montoTotal')?.errors?.['min']">
+                El monto debe ser mayor a 0
+              </div>
+            </div>
+  
+            <!-- Notas -->
+            <div class="col-md-12 mb-3">
+              <label class="form-label">Notas</label>
+              <textarea 
+                class="form-control"
+                formControlName="notas"
+                rows="3">
+              </textarea>
+            </div>
+          </div>
+  
+          <!-- Terapeutas -->
+          <div class="row mb-3">
+            <div class="col-12">
+              <h4>Terapeutas</h4>
+              <button type="button" class="btn btn-secondary mb-3" (click)="addTerapeuta()">
+                <i class="fas fa-plus me-2"></i>Agregar Terapeuta
+              </button>
+  
+              <div formArrayName="terapeutas">
+                <div *ngFor="let terapeuta of terapeutasArray.controls; let i = index" class="row mb-3" [formGroupName]="i">
+                  <!-- Selección de Terapeuta -->
+                  <div class="col-md-6">
+                    <select 
+                      class="form-select"
+                      formControlName="terapeutaId"
+                      [ngClass]="{'is-invalid': terapeuta.get('terapeutaId')?.touched && terapeuta.get('terapeutaId')?.invalid}">
+                      <option value="">Seleccione terapeuta...</option>
+                      <option *ngFor="let t of terapeutas" [value]="t.id">
+                        {{t.nombre}} {{t.apellido}}
+                      </option>
+                    </select>
+                    <div class="invalid-feedback">
+                      Debe seleccionar un terapeuta
+                    </div>
+                  </div>
+  
+                  <!-- Monto del Terapeuta -->
+                  <div class="col-md-4">
+                    <input 
+                      type="number" 
+                      class="form-control"
+                      formControlName="montoTerapeuta"
+                      placeholder="Monto"
+                      [ngClass]="{'is-invalid': terapeuta.get('montoTerapeuta')?.touched && terapeuta.get('montoTerapeuta')?.invalid}">
+                    <div class="invalid-feedback">
+                      El monto es requerido y debe ser mayor a 0
+                    </div>
+                  </div>
+  
+                  <!-- Botón Eliminar -->
+                  <div class="col-md-2">
+                    <button type="button" class="btn btn-danger" (click)="removeTerapeuta(i)">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Botones de acción -->
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary" (click)="onCancel()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="loading">
+              {{isEditing ? 'Actualizar' : 'Crear'}} Servicio
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

@@ -39,12 +39,12 @@ export class LoginComponent {
           if (response.success) {
             this.router.navigate(['/admin/dashboard']);
           } else {
-            this.alertService.error(response.message || 'Error de autenticación');
+            this.alertService.error(response.message || 'Error de autenticación', 'Error de Login');
           }
         },
         error: (error) => {
           console.error('Error de login:', error);
-          this.alertService.error('Error al iniciar sesión. Por favor, verifica tus credenciales.');
+          this.alertService.error('Error al iniciar sesión. Por favor, intente nuevamente.', 'Error de Login');
         },
         complete: () => {
           this.loading = false;

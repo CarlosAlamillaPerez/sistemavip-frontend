@@ -45,7 +45,7 @@ export class ErrorHandlerService {
       }
     }
 
-    this.alertService.error(errorMessage);
+    this.alertService.error(errorMessage, 'Error');
   }
 
   private handleValidationError(error: any): string {

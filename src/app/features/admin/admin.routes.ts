@@ -17,11 +17,11 @@ export const ADMIN_ROUTES: Routes = [
         children: [
           {
             path: '',
-            loadComponent: () => import('./personal/personal.component').then(m => m.PersonalComponent)
+            loadComponent: () => import('../personal/personal.component').then(m => m.PersonalComponent)
           },
           {
             path: 'presentadores',
-            loadChildren: () => import('./personal/presentadores/presentadores.routes')
+            loadChildren: () => import('../personal/presentadores/presentadores.routes')
               .then(m => m.PRESENTADORES_ROUTES),
             canActivate: [RoleGuard([UserRole.SUPER_ADMIN, UserRole.ADMIN])]
           }
@@ -29,7 +29,7 @@ export const ADMIN_ROUTES: Routes = [
       },
       {
         path: 'comisiones',
-        loadComponent: () => import('./comisiones/comisiones.component').then(m => m.ComisionesComponent)
+        loadComponent: () => import('../personal/comisiones/comisiones.component').then(m => m.ComisionesComponent)
       },
       {
         path: 'reportes',

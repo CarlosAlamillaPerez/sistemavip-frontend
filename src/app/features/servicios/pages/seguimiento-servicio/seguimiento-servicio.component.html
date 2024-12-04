@@ -1,0 +1,153 @@
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col">
+        <h2>Seguimiento de Servicio</h2>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-secondary" (click)="onBack()">
+          <i class="fas fa-arrow-left me-2"></i>Volver
+        </button>
+      </div>
+    </div>
+  
+    <!-- Loading spinner -->
+    <div class="text-center py-5" *ngIf="loading">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  
+    <!-- Contenido del servicio -->
+    <ng-container *ngIf="!loading && servicio">
+      <!-- Información general -->
+      <div class="row">
+        <div class="col-md-12 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Información General</h5>
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label class="fw-bold">ID:</label>
+                  <p>{{servicio.id}}</p>
+                </div>
+                <div class="col-md-3">
+                  <label class="fw-bold">Fecha Servicio:</label>
+                  <p>{{servicio.fechaServicio | date:'dd/MM/yyyy HH:mm'}}</p>
+                </div>
+                <div class="col-md-3">
+                  <label class="fw-bold">Tipo:</label>
+                  <p>{{servicio.tipoServicio}}</p>
+                </div>
+                <div class="col-md-3">
+                  <label class="fw-bold">Estado:</label>
+                  <span class="badge" [ngClass]="getEstadoClass(servicio.estado)">
+                    {{servicio.estado}}
+                  </span>
+                </div>
+                <div class="col-md-6">
+                  <label class="fw-bold">Presentador:</label>
+                  <p>{{servicio.nombrePresentador}}</p>
+                </div>
+                <div class="col-md-6">
+                  <label class="fw-bold">Monto Total:</label>
+                  <p>{{servicio.montoTotal | currency}}</p>
+                </div>
+                <div class="col-12" *ngIf="servicio.direccion">
+                  <label class="fw-bold">Dirección:</label>
+                  <p>{{servicio.direccion}}</p>
+                </div>
+                <div class="col-12" *ngIf="servicio.notas">
+                  <label class="fw-bold">Notas:</label>
+                  <p>{{servicio.notas}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Lista de terapeutas -->
+      <div class="row">
+        <div class="col-md-12 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Terapeutas Asignados</h5>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Estado</th>
+                      <th>Hora Inicio</th>
+                      <th>Hora Fin</th>
+                      <th>Monto</th>
+                      <th>Links</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let terapeuta of servicio.terapeutas">
+                      <td>{{terapeuta.nombreTerapeuta}}</td>
+                      <td>
+                        <span class="badge" [ngClass]="getEstadoClass(terapeuta.estado)">
+                          {{terapeuta.estado}}
+                        </span>
+                      </td>
+                      <td>{{getHoraFormateada(terapeuta.horaInicio)}}</td>
+                      <td>{{getHoraFormateada(terapeuta.horaFin)}}</td>
+                      <td>{{terapeuta.montoTerapeuta | currency}}</td>
+                      <td>
+                        <div class="btn-group">
+                            <button 
+                            *ngIf="terapeuta.estado === 'Pendiente'"
+                            class="btn btn-sm btn-primary me-1"
+                            [cdkCopyToClipboard]="terapeuta.linkConfirmacion"
+                            (cdkCopyToClipboardCopied)="alertService.success('Copiado', 'Link de confirmación copiado al portapapeles')"
+                            title="Copiar link de confirmación">
+                            <i class="fas fa-clipboard"></i>
+                          </button>
+                          <button 
+                            *ngIf="terapeuta.estado === 'EnProceso'"
+                            class="btn btn-sm btn-success"
+                            [cdkCopyToClipboard]="terapeuta.linkFinalizacion"
+                            (cdkCopyToClipboardCopied)="alertService.success('Copiado', 'Link de finalización copiado al portapapeles')"
+                            title="Copiar link de finalización">
+                            <i class="fas fa-clipboard"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Información de cancelación si aplica -->
+      <div class="row" *ngIf="servicio.estado === 'Cancelado'">
+        <div class="col-md-12">
+          <div class="card border-danger">
+            <div class="card-body">
+              <h5 class="card-title text-danger">Información de Cancelación</h5>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="fw-bold">Fecha:</label>
+                  <p>{{servicio.fechaCancelacion | date:'dd/MM/yyyy HH:mm'}}</p>
+                </div>
+                <div class="col-md-8">
+                  <label class="fw-bold">Motivo:</label>
+                  <p>{{servicio.motivoCancelacion}}</p>
+                </div>
+                <div class="col-12" *ngIf="servicio.notasCancelacion">
+                  <label class="fw-bold">Notas:</label>
+                  <p>{{servicio.notasCancelacion}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>

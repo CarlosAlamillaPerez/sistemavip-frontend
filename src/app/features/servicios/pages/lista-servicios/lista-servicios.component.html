@@ -1,0 +1,87 @@
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col">
+        <h2>Servicios</h2>
+      </div>
+      <div class="col-auto" *ngIf="isAdmin || isPresentador">
+        <button class="btn btn-primary" (click)="onCrearServicio()">
+          <i class="fas fa-plus me-2"></i>Nuevo Servicio
+        </button>
+      </div>
+    </div>
+  
+    <!-- Card principal -->
+    <div class="card">
+      <div class="card-body">
+        <!-- Loading spinner -->
+        <div class="text-center py-5" *ngIf="loading">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+  
+        <!-- Tabla de servicios -->
+        <div class="table-responsive" *ngIf="!loading">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Fecha Servicio</th>
+                <th>Tipo</th>
+                <th>Presentador</th>
+                <th>Dirección</th>
+                <th>Monto Total</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let servicio of servicios">
+                <td>{{servicio.id}}</td>
+                <td>{{servicio.fechaServicio | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td>{{servicio.tipoServicio}}</td>
+                <td>{{servicio.nombrePresentador}}</td>
+                <td>{{servicio.direccion}}</td>
+                <td>{{servicio.montoTotal | currency}}</td>
+                <td>
+                  <span class="badge" [ngClass]="getEstadoClass(servicio.estado)">
+                    {{servicio.estado}}
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group">
+                    <button 
+                      class="btn btn-sm btn-info me-1" 
+                      (click)="onVerSeguimiento(servicio.id)"
+                      title="Ver seguimiento">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button 
+                      *ngIf="servicio.estado === 'Pendiente' && (isAdmin || isPresentador)"
+                      class="btn btn-sm btn-primary me-1" 
+                      (click)="onEditarServicio(servicio.id)"
+                      title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button 
+                      *ngIf="servicio.estado === 'Pendiente' && (isAdmin || isPresentador)"
+                      class="btn btn-sm btn-danger" 
+                      (click)="onCancelarServicio(servicio)"
+                      title="Cancelar">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+  
+          <!-- Mensaje cuando no hay servicios -->
+          <div class="text-center py-5" *ngIf="!loading && servicios.length === 0">
+            No hay servicios registrados
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

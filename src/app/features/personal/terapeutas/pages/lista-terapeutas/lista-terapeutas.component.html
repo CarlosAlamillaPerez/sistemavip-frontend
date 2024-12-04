@@ -1,0 +1,69 @@
+<div class="container-fluid">
+    <div class="row mb-4">
+      <div class="col">
+        <h2>Terapeutas</h2>
+      </div>
+      <div class="col-auto" *ngIf="isSuperAdmin">
+        <button class="btn btn-primary" (click)="onNuevo()">Nuevo Terapeuta</button>
+      </div>
+    </div>
+  
+    <div class="card">
+      <div class="card-body">
+        <div class="text-center py-5" *ngIf="loading">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+  
+        <div class="table-responsive" *ngIf="!loading">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Tarifa Base</th>
+                <th>Tarifa Extra</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let terapeuta of terapeutas">
+                <td>{{terapeuta.nombre}} {{terapeuta.apellido}}</td>
+                <td>{{terapeuta.email}}</td>
+                <td>{{terapeuta.telefono}}</td>
+                <td>${{terapeuta.tarifaBase}}</td>
+                <td>${{terapeuta.tarifaExtra}}</td>
+                <td>
+                  <span class="badge" 
+                        [ngClass]="{'bg-success': terapeuta.estado === 'Activo', 
+                                  'bg-danger': terapeuta.estado === 'Inactivo'}">
+                    {{terapeuta.estado}}
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group" role="group">
+                    <button class="btn btn-sm btn-outline-primary" (click)="onEditar(terapeuta.id)">
+                      Editar
+                    </button>
+                    <button class="btn btn-sm btn-outline-warning" 
+                            (click)="onCambiarEstado(terapeuta.id, terapeuta.estado === 'Activo' ? 'Inactivo' : 'Activo')">
+                      {{terapeuta.estado === 'Activo' ? 'Desactivar' : 'Activar'}}
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="onEliminar(terapeuta.id)">
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="text-center py-5" *ngIf="!loading && terapeutas.length === 0">
+            No hay terapeutas registrados
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

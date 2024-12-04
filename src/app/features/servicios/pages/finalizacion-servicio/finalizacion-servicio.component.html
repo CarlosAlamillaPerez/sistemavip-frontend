@@ -1,0 +1,77 @@
+<div class="container-fluid">
+    <div class="row mb-4">
+      <div class="col">
+        <h2>Finalización de Servicio</h2>
+      </div>
+    </div>
+  
+    <!-- Loading -->
+    <div class="text-center py-5" *ngIf="loading">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  
+    <!-- Error -->
+    <div class="alert alert-danger" *ngIf="error">
+      {{ error }}
+    </div>
+  
+    <!-- Información del Servicio -->
+    <div class="card" *ngIf="servicio && !error">
+      <div class="card-body">
+        <h5 class="card-title mb-4">Detalles del Servicio</h5>
+        
+        <div class="row g-3">
+          <div class="col-md-6">
+            <strong>Terapeuta:</strong>
+            <p>{{ servicio.nombreTerapeuta }}</p>
+          </div>
+  
+          <div class="col-md-6">
+            <strong>Estado:</strong>
+            <span class="badge" [ngClass]="getEstadoClass(servicio.estado)">
+              {{ servicio.estado }}
+            </span>
+          </div>
+  
+          <div class="col-md-6">
+            <strong>Hora de Inicio:</strong>
+            <p>{{ servicio.horaInicio | date:'HH:mm' }}</p>
+          </div>
+  
+          <div class="col-md-6">
+            <strong>Duración:</strong>
+            <p>{{ duracionServicio }}</p>
+          </div>
+  
+          <div class="col-md-6">
+            <strong>Monto:</strong>
+            <p>{{ servicio.montoTerapeuta | currency }}</p>
+          </div>
+  
+          <div class="col-12 mt-4">
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              Al finalizar el servicio:
+              <ul class="mb-0 mt-2">
+                <li>Se registrará tu ubicación actual</li>
+                <li>Se calculará el tiempo total del servicio</li>
+                <li>Esta acción no se puede deshacer</li>
+              </ul>
+            </div>
+          </div>
+  
+          <div class="col-12">
+            <button 
+              class="btn btn-primary"
+              [disabled]="finalizando || servicio.estado === 'Finalizado'"
+              (click)="finalizarServicio()">
+              <span class="spinner-border spinner-border-sm me-2" *ngIf="finalizando"></span>
+              {{ finalizando ? 'Finalizando...' : 'Finalizar Servicio' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

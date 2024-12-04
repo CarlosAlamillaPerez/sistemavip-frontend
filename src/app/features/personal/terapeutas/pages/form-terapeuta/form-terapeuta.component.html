@@ -1,0 +1,129 @@
+<div class="container-fluid">
+    <div class="row mb-4">
+      <div class="col">
+        <h2>{{isEditing ? 'Editar' : 'Nuevo'}} Terapeuta</h2>
+      </div>
+    </div>
+  
+    <div class="card">
+      <div class="card-body">
+        <div class="text-center py-5" *ngIf="loading">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+  
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loading">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nombre *</label>
+              <input type="text" class="form-control" formControlName="nombre"
+                     [ngClass]="{'is-invalid': form.get('nombre')?.touched && form.get('nombre')?.invalid}">
+              <div class="invalid-feedback" *ngIf="form.get('nombre')?.errors?.['required']">
+                El nombre es requerido
+              </div>
+              <div class="invalid-feedback" *ngIf="form.get('nombre')?.errors?.['maxlength']">
+                El nombre no puede exceder los 100 caracteres
+              </div>
+            </div>
+  
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Apellido *</label>
+              <input type="text" class="form-control" formControlName="apellido"
+                     [ngClass]="{'is-invalid': form.get('apellido')?.touched && form.get('apellido')?.invalid}">
+              <div class="invalid-feedback" *ngIf="form.get('apellido')?.errors?.['required']">
+                El apellido es requerido
+              </div>
+              <div class="invalid-feedback" *ngIf="form.get('apellido')?.errors?.['maxlength']">
+                El apellido no puede exceder los 100 caracteres
+              </div>
+            </div>
+  
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Email *</label>
+              <input type="email" class="form-control" formControlName="email"
+                     [ngClass]="{'is-invalid': form.get('email')?.touched && form.get('email')?.invalid}">
+              <div class="invalid-feedback" *ngIf="form.get('email')?.errors?.['required']">
+                El email es requerido
+              </div>
+              <div class="invalid-feedback" *ngIf="form.get('email')?.errors?.['email']">
+                Ingrese un email válido
+              </div>
+            </div>
+  
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Teléfono *</label>
+              <input type="text" class="form-control" formControlName="telefono"
+                     [ngClass]="{'is-invalid': form.get('telefono')?.touched && form.get('telefono')?.invalid}">
+              <div class="invalid-feedback" *ngIf="form.get('telefono')?.errors?.['required']">
+                El teléfono es requerido
+              </div>
+            </div>
+  
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Fecha de Nacimiento *</label>
+              <input type="date" class="form-control" formControlName="fechaNacimiento"
+                     [ngClass]="{'is-invalid': form.get('fechaNacimiento')?.touched && form.get('fechaNacimiento')?.invalid}">
+              <div class="invalid-feedback" *ngIf="form.get('fechaNacimiento')?.errors?.['required']">
+                La fecha de nacimiento es requerida
+              </div>
+            </div>
+  
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Estatura *</label>
+              <input type="text" class="form-control" formControlName="estatura"
+                     [ngClass]="{'is-invalid': form.get('estatura')?.touched && form.get('estatura')?.invalid}">
+              <div class="invalid-feedback" *ngIf="form.get('estatura')?.errors?.['required']">
+                La estatura es requerida
+              </div>
+            </div>
+  
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Documento de Identidad *</label>
+              <input type="text" class="form-control" formControlName="documentoIdentidad"
+                     [ngClass]="{'is-invalid': form.get('documentoIdentidad')?.touched && form.get('documentoIdentidad')?.invalid}">
+              <div class="invalid-feedback" *ngIf="form.get('documentoIdentidad')?.errors?.['required']">
+                El documento de identidad es requerido
+              </div>
+            </div>
+  
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Tarifa Base *</label>
+              <input type="number" class="form-control" formControlName="tarifaBase"
+                     [ngClass]="{'is-invalid': form.get('tarifaBase')?.touched && form.get('tarifaBase')?.invalid}">
+              <div class="invalid-feedback" *ngIf="form.get('tarifaBase')?.errors?.['required']">
+                La tarifa base es requerida
+              </div>
+              <div class="invalid-feedback" *ngIf="form.get('tarifaBase')?.errors?.['min']">
+                La tarifa base no puede ser negativa
+              </div>
+            </div>
+  
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Tarifa Extra *</label>
+              <input type="number" class="form-control" formControlName="tarifaExtra"
+                     [ngClass]="{'is-invalid': form.get('tarifaExtra')?.touched && form.get('tarifaExtra')?.invalid}">
+              <div class="invalid-feedback" *ngIf="form.get('tarifaExtra')?.errors?.['required']">
+                La tarifa extra es requerida
+              </div>
+              <div class="invalid-feedback" *ngIf="form.get('tarifaExtra')?.errors?.['min']">
+                La tarifa extra no puede ser negativa
+              </div>
+            </div>
+  
+            <div class="col-12 mb-3">
+              <label class="form-label">Notas</label>
+              <textarea class="form-control" formControlName="notas" rows="3"></textarea>
+            </div>
+          </div>
+  
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" [disabled]="loading">
+              {{isEditing ? 'Actualizar' : 'Crear'}}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

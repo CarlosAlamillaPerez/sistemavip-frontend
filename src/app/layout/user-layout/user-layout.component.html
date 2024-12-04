@@ -1,0 +1,30 @@
+<div class="d-flex">
+    <!-- Sidebar -->
+    <nav class="sidebar bg-dark text-white p-3">
+      <h5 class="mb-4">Sistema VIP</h5>
+      <div class="nav flex-column nav-pills">
+        <a class="nav-link text-white mb-2" 
+           routerLink="/servicios" 
+           routerLinkActive="active">
+          Servicios
+        </a>
+        <a class="nav-link text-white mb-2" 
+           routerLink="/personal/terapeutas" 
+           routerLinkActive="active"
+           *ngIf="authService.isPresentador() | async">
+          Mis Terapeutas
+        </a>
+        <a class="nav-link text-white mb-2" 
+           routerLink="/blacklist" 
+           routerLinkActive="active"
+           *ngIf="authService.isPresentador() | async">
+          Blacklist
+        </a>
+      </div>
+    </nav>
+  
+    <!-- Main Content -->
+    <main class="main-content p-4">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
