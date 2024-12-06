@@ -5,7 +5,9 @@ import { environment } from '@env/environment';
 import {
   TerapeutaPresentador,
   TerapeutaPorPresentador,
-  AsignarTerapeutaPresentadorRequest
+  AsignarTerapeutaPresentadorRequest,
+  CambioEstadoAsignacionRequest,
+  EstadoAsignacion
 } from '@core/interfaces/terapeuta-presentador.interface';
 
 @Injectable({
@@ -28,11 +30,22 @@ export class TerapeutaPresentadorService {
     return this.http.post<TerapeutaPresentador>(this.apiUrl, data);
   }
 
-  updateEstado(terapeutaId: number, presentadorId: number, estado: string): Observable<void> {
+  cambiarEstado(
+    terapeutaId: number, 
+    presentadorId: number, 
+    cambioEstado: CambioEstadoAsignacionRequest
+  ): Observable<void> {
     return this.http.patch<void>(
       `${this.apiUrl}/${terapeutaId}/${presentadorId}/estado`,
-      JSON.stringify(estado),
+      cambioEstado,
       { headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+  // Método helper para validar asignaciones
+  validarAsignacion(terapeutaId: number, presentadorId: number): Observable<boolean> {
+    return this.http.get<boolean>(
+      `${this.apiUrl}/validar/${terapeutaId}/${presentadorId}`
     );
   }
 }

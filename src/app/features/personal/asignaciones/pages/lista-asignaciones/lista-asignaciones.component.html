@@ -1,71 +1,92 @@
 <div class="container-fluid">
-    <div class="row mb-4">
-      <div class="col">
-        <h2>Asignaciones Terapeuta-Presentador</h2>
-      </div>
-      <div class="col-auto" *ngIf="isSuperAdmin">
-        <button class="btn btn-primary" (click)="onNueva()">
-          Nueva Asignación
-        </button>
-      </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Asignaciones Terapeuta-Presentador</h2>
     </div>
-  
-    <div class="card">
-      <div class="card-body">
-        <div class="text-center py-5" *ngIf="loading">
-          <div class="spinner-border" role="status">
-            <span class="visually-hidden">Cargando...</span>
-          </div>
+    <div class="col-auto" *ngIf="isSuperAdmin">
+      <button class="btn btn-primary" (click)="onNueva()">
+        <i class="fas fa-plus me-2"></i>Nueva Asignación
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="text-center py-5" *ngIf="loading">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Cargando...</span>
         </div>
-  
-        <div class="table-responsive" *ngIf="!loading">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Terapeuta</th>
-                <th>Presentador</th>
-                <th>Fecha Asignación</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let asignacion of asignaciones">
-                <td>{{asignacion.nombreTerapeuta}} {{asignacion.apellidoTerapeuta}}</td>
-                <td>{{asignacion.nombrePresentador}} {{asignacion.apellidoPresentador}}</td>
-                <td>{{asignacion.fechaAsignacion | date:'dd/MM/yyyy'}}</td>
-                <td>
-                  <span class="badge" 
-                        [ngClass]="{
-                          'bg-warning': asignacion.estado === 'Pendiente',
-                          'bg-success': asignacion.estado === 'Confirmado',
-                          'bg-info': asignacion.estado === 'EnProceso',
-                          'bg-primary': asignacion.estado === 'Finalizado',
-                          'bg-danger': ['Cancelado', 'NoRealizado'].includes(asignacion.estado)
-                        }">
-                    {{asignacion.estado}}
-                  </span>
-                </td>
-                <td>
-                  <div class="btn-group" role="group">
-                    <button class="btn btn-outline-primary btn-sm"
-                            (click)="onVerTerapeutas(asignacion.presentadorId)">
-                      Ver Terapeutas
-                    </button>
-                    <button class="btn btn-outline-warning btn-sm" 
-                            *ngIf="isSuperAdmin && asignacion.estado === 'Pendiente'"
-                            (click)="onUpdateEstado(asignacion.terapeutaId, asignacion.presentadorId, 'Confirmado')">
-                      Confirmar
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="text-center py-5" *ngIf="!loading && asignaciones.length === 0">
-            No hay asignaciones registradas
-          </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!loading">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Terapeuta</th>
+              <th>Presentador</th>
+              <th>Fecha Asignación</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let asignacion of asignaciones">
+              <td>{{asignacion.nombreTerapeuta}} {{asignacion.apellidoTerapeuta}}</td>
+              <td>{{asignacion.nombrePresentador}} {{asignacion.apellidoPresentador}}</td>
+              <td>{{asignacion.fechaAsignacion | date:'dd/MM/yyyy'}}</td>
+              <td>
+                <span class="badge" [ngClass]="getEstadoClass(asignacion.estado)">
+                  {{asignacion.estado}}
+                </span>
+                <small class="d-block text-muted" *ngIf="asignacion.motivoEstado">
+                  {{asignacion.motivoEstado}}
+                </small>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button 
+                    class="btn btn-sm btn-outline-primary" 
+                    (click)="onVerTerapeutas(asignacion.presentadorId)"
+                    title="Ver terapeutas asignados">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    Estado
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li *ngIf="asignacion.estado !== estadosAsignacion.ACTIVO">
+                      <a class="dropdown-item" href="javascript:void(0)"
+                         (click)="onCambiarEstado(asignacion.terapeutaId, asignacion.presentadorId, estadosAsignacion.ACTIVO)">
+                        <i class="fas fa-check-circle text-success me-2"></i>Activar
+                      </a>
+                    </li>
+                    <li *ngIf="asignacion.estado !== estadosAsignacion.INACTIVO">
+                      <a class="dropdown-item" href="javascript:void(0)"
+                         (click)="onCambiarEstado(asignacion.terapeutaId, asignacion.presentadorId, estadosAsignacion.INACTIVO)">
+                        <i class="fas fa-times-circle text-danger me-2"></i>Finalizar
+                      </a>
+                    </li>
+                    <li *ngIf="asignacion.estado !== estadosAsignacion.SUSPENDIDO">
+                      <a class="dropdown-item" href="javascript:void(0)"
+                         (click)="onCambiarEstado(asignacion.terapeutaId, asignacion.presentadorId, estadosAsignacion.SUSPENDIDO)">
+                        <i class="fas fa-pause-circle text-warning me-2"></i>Suspender
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="text-center py-5" *ngIf="!loading && asignaciones.length === 0">
+          <p class="text-muted mb-0">No hay asignaciones registradas</p>
         </div>
       </div>
     </div>
   </div>
+</div>

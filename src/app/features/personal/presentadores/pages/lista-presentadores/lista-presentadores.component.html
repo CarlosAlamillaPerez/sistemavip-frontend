@@ -1,88 +1,87 @@
 <div class="container-fluid">
-    <div class="row mb-4">
-      <div class="col">
-        <h2>Presentadores</h2>
-      </div>
-      <div class="col-auto" *ngIf="isSuperAdmin">
-        <button class="btn btn-primary" (click)="onNuevo()">
-          Nuevo Presentador
-        </button>
-      </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Presentadores</h2>
     </div>
-  
-    <div class="card">
-      <div class="card-body">
-        <!-- Loading Spinner -->
-        <div class="text-center py-5" *ngIf="loading">
-          <div class="spinner-border" role="status">
-            <span class="visually-hidden">Cargando...</span>
-          </div>
+    <div class="col-auto" *ngIf="isSuperAdmin">
+      <button class="btn btn-primary" (click)="onNuevo()">
+        <i class="fas fa-plus me-2"></i>Nuevo Presentador
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="text-center py-5" *ngIf="loading">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Cargando...</span>
         </div>
-  
-        <!-- Table -->
-        <div class="table-responsive" *ngIf="!loading">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Teléfono</th>
-                <th>Comisión</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let presentador of presentadores">
-                <td>{{presentador.nombre}} {{presentador.apellido}}</td>
-                <td>{{presentador.email}}</td>
-                <td>{{presentador.telefono}}</td>
-                <td>{{presentador.porcentajeComision}}%</td>
-                <td>
-                  <span class="badge" 
-                        [ngClass]="{'bg-success': presentador.estado === 'Activo', 
-                                  'bg-danger': presentador.estado === 'Inactivo'}">
-                    {{presentador.estado}}
-                  </span>
-                </td>
-                <td>
-                  <div class="btn-group" role="group">
-                    <button class="btn btn-sm btn-outline-primary" 
-                            (click)="onEditar(presentador.id)"
-                            title="Editar">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    
-                    <button *ngIf="isSuperAdmin" 
-                            class="btn btn-sm btn-outline-danger" 
-                            (click)="onEliminar(presentador.id)"
-                            title="Eliminar">
-                      <i class="fas fa-trash"></i>
-                    </button>
-  
-                    <button *ngIf="isSuperAdmin" 
-                            class="btn btn-sm" 
-                            [ngClass]="{'btn-outline-success': presentador.estado === 'Inactivo',
-                                      'btn-outline-danger': presentador.estado === 'Activo'}"
-                            (click)="onCambiarEstado(presentador.id, 
-                                    presentador.estado === 'Activo' ? 'Inactivo' : 'Activo')"
-                            [title]="presentador.estado === 'Activo' ? 'Desactivar' : 'Activar'">
-                      <i class="fas" 
-                         [ngClass]="{'fa-check-circle': presentador.estado === 'Inactivo',
-                                   'fa-times-circle': presentador.estado === 'Activo'}">
-                      </i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-  
-          <!-- Empty State -->
-          <div class="text-center py-5" *ngIf="!loading && presentadores.length === 0">
-            <p class="text-muted">No hay presentadores registrados</p>
-          </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!loading">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>Comisión</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let presentador of presentadores">
+              <td>{{presentador.nombre}} {{presentador.apellido}}</td>
+              <td>{{presentador.email}}</td>
+              <td>{{presentador.telefono}}</td>
+              <td>{{presentador.porcentajeComision}}%</td>
+              <td>
+                <span class="badge" [ngClass]="getEstadoClass(presentador.estado)">
+                  {{presentador.estado}}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-primary" (click)="onEditar(presentador.id)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                          type="button" 
+                          data-bs-toggle="dropdown" 
+                          aria-expanded="false">
+                    Estado
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li *ngIf="presentador.estado !== estadosPresentador.ACTIVO">
+                      <a class="dropdown-item" href="javascript:void(0)" 
+                         (click)="onCambiarEstado(presentador.id, estadosPresentador.ACTIVO)">
+                        <i class="fas fa-check-circle text-success me-2"></i>Activar
+                      </a>
+                    </li>
+                    <li *ngIf="presentador.estado !== estadosPresentador.INACTIVO">
+                      <a class="dropdown-item" href="javascript:void(0)" 
+                         (click)="onCambiarEstado(presentador.id, estadosPresentador.INACTIVO)">
+                        <i class="fas fa-times-circle text-danger me-2"></i>Dar de Baja
+                      </a>
+                    </li>
+                    <li *ngIf="presentador.estado !== estadosPresentador.SUSPENDIDO">
+                      <a class="dropdown-item" href="javascript:void(0)" 
+                         (click)="onCambiarEstado(presentador.id, estadosPresentador.SUSPENDIDO)">
+                        <i class="fas fa-pause-circle text-warning me-2"></i>Suspender
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="text-center py-5" *ngIf="!loading && presentadores.length === 0">
+          <p class="text-muted mb-0">No hay presentadores registrados</p>
         </div>
       </div>
     </div>
   </div>
+</div>

@@ -4,7 +4,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { PresentadorService } from '@core/services/presentador.service';
 import { AlertService } from '@core/services/alert.service';
-import { CreatePresentadorRequest, UpdatePresentadorRequest, Presentador } from '@core/interfaces/presentador.interface';
+import { 
+  CreatePresentadorRequest, 
+  UpdatePresentadorRequest, 
+  Presentador,
+  EstadoPresentador 
+} from '@core/interfaces/presentador.interface';
 
 @Component({
   selector: 'app-form-presentador',
@@ -18,6 +23,8 @@ export class FormPresentadorComponent implements OnInit {
   loading = false;
   isEditing = false;
   presentadorId?: number;
+  presentador?: Presentador;
+  estadosPresentador = EstadoPresentador;
 
   constructor(
     private fb: FormBuilder,
@@ -51,6 +58,7 @@ export class FormPresentadorComponent implements OnInit {
     this.loading = true;
     this.presentadorService.getById(this.presentadorId).subscribe({
       next: (presentador) => {
+        this.presentador = presentador;
         this.form.patchValue({
           nombre: presentador.nombre,
           apellido: presentador.apellido,
@@ -71,6 +79,23 @@ export class FormPresentadorComponent implements OnInit {
         );
       }
     });
+  }
+
+  getEstadoClass(estado: string): string {
+    switch (estado) {
+      case EstadoPresentador.ACTIVO:
+        return 'text-success';
+      case EstadoPresentador.INACTIVO:
+        return 'text-danger';
+      case EstadoPresentador.SUSPENDIDO:
+        return 'text-warning';
+      default:
+        return 'text-secondary';
+    }
+  }
+
+  formatFecha(fecha: Date): string {
+    return new Date(fecha).toLocaleString();
   }
 
   onSubmit(): void {

@@ -1,3 +1,9 @@
+export enum EstadoTerapeuta {
+  ACTIVO = 'ACTIVO',
+  INACTIVO = 'INACTIVO',
+  SUSPENDIDO = 'SUSPENDIDO'
+}
+
 export interface Terapeuta {
     id: number;
     userId: string;
@@ -7,7 +13,9 @@ export interface Terapeuta {
     email: string;
     fechaNacimiento: Date;
     fechaAlta: Date;
-    estado: string;
+    estado: EstadoTerapeuta;
+    fechaCambioEstado: Date;
+    motivoEstado?: string;
     estatura: string;
     documentoIdentidad: string;
     fotoUrl?: string;
@@ -15,9 +23,9 @@ export interface Terapeuta {
     notas?: string;
     tarifaBase: number;
     tarifaExtra: number;
-  }
-  
-  export interface CreateTerapeutaRequest {
+}
+
+export interface CreateTerapeutaRequest {
     nombre: string;
     apellido: string;
     telefono: string;
@@ -29,9 +37,9 @@ export interface Terapeuta {
     notas?: string;
     tarifaBase: number;
     tarifaExtra: number;
-  }
-  
-  export interface UpdateTerapeutaRequest {
+}
+
+export interface UpdateTerapeutaRequest {
     nombre?: string;
     apellido?: string;
     telefono?: string;
@@ -39,9 +47,14 @@ export interface Terapeuta {
     estatura?: string;
     fotoUrl?: string;
     notas?: string;
-  }
-  
-  export interface UpdateTarifasRequest {
+}
+
+export interface UpdateTarifasRequest {
     tarifaBase: number;
     tarifaExtra: number;
-  }
+}
+
+export interface CambioEstadoTerapeutaRequest {
+    estado: EstadoTerapeuta;
+    motivoEstado?: string;
+}

@@ -1,149 +1,133 @@
 <div class="container-fluid">
-    <div class="row mb-4">
-      <div class="col">
-        <h2>{{isEditing ? 'Editar' : 'Nuevo'}} Presentador</h2>
-      </div>
-    </div>
-  
-    <div class="card">
-      <div class="card-body">
-        <!-- Loading Spinner -->
-        <div class="text-center py-5" *ngIf="loading">
-          <div class="spinner-border" role="status">
-            <span class="visually-hidden">Cargando...</span>
-          </div>
-        </div>
-  
-        <!-- Form -->
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loading">
-          <div class="row">
-            <!-- Nombre -->
-            <div class="col-md-6 mb-3">
-              <label for="nombre" class="form-label">Nombre *</label>
-              <input
-                type="text"
-                class="form-control"
-                id="nombre"
-                formControlName="nombre"
-                [ngClass]="{'is-invalid': form.get('nombre')?.invalid && form.get('nombre')?.touched}"
-              >
-              <div class="invalid-feedback" *ngIf="form.get('nombre')?.errors?.['required']">
-                El nombre es requerido
-              </div>
-              <div class="invalid-feedback" *ngIf="form.get('nombre')?.errors?.['maxlength']">
-                El nombre no puede exceder los 100 caracteres
-              </div>
-            </div>
-  
-            <!-- Apellido -->
-            <div class="col-md-6 mb-3">
-              <label for="apellido" class="form-label">Apellido *</label>
-              <input
-                type="text"
-                class="form-control"
-                id="apellido"
-                formControlName="apellido"
-                [ngClass]="{'is-invalid': form.get('apellido')?.invalid && form.get('apellido')?.touched}"
-              >
-              <div class="invalid-feedback" *ngIf="form.get('apellido')?.errors?.['required']">
-                El apellido es requerido
-              </div>
-              <div class="invalid-feedback" *ngIf="form.get('apellido')?.errors?.['maxlength']">
-                El apellido no puede exceder los 100 caracteres
-              </div>
-            </div>
-  
-            <!-- Email -->
-            <div class="col-md-6 mb-3">
-              <label for="email" class="form-label">Email *</label>
-              <input
-                type="email"
-                class="form-control"
-                id="email"
-                formControlName="email"
-                [ngClass]="{'is-invalid': form.get('email')?.invalid && form.get('email')?.touched}"
-              >
-              <div class="invalid-feedback" *ngIf="form.get('email')?.errors?.['required']">
-                El email es requerido
-              </div>
-              <div class="invalid-feedback" *ngIf="form.get('email')?.errors?.['email']">
-                Ingrese un email válido
-              </div>
-            </div>
-  
-            <!-- Teléfono -->
-            <div class="col-md-6 mb-3">
-              <label for="telefono" class="form-label">Teléfono *</label>
-              <input
-                type="tel"
-                class="form-control"
-                id="telefono"
-                formControlName="telefono"
-                [ngClass]="{'is-invalid': form.get('telefono')?.invalid && form.get('telefono')?.touched}"
-              >
-              <div class="invalid-feedback" *ngIf="form.get('telefono')?.errors?.['required']">
-                El teléfono es requerido
-              </div>
-            </div>
-  
-            <!-- Documento Identidad -->
-            <div class="col-md-6 mb-3">
-              <label for="documentoIdentidad" class="form-label">Documento de Identidad *</label>
-              <input
-                type="text"
-                class="form-control"
-                id="documentoIdentidad"
-                formControlName="documentoIdentidad"
-                [ngClass]="{'is-invalid': form.get('documentoIdentidad')?.invalid && form.get('documentoIdentidad')?.touched}"
-              >
-              <div class="invalid-feedback" *ngIf="form.get('documentoIdentidad')?.errors?.['required']">
-                El documento de identidad es requerido
-              </div>
-            </div>
-  
-            <!-- Porcentaje Comisión -->
-            <div class="col-md-6 mb-3">
-              <label for="porcentajeComision" class="form-label">Porcentaje de Comisión *</label>
-              <input
-                type="number"
-                class="form-control"
-                id="porcentajeComision"
-                formControlName="porcentajeComision"
-                [ngClass]="{'is-invalid': form.get('porcentajeComision')?.invalid && form.get('porcentajeComision')?.touched}"
-              >
-              <div class="invalid-feedback" *ngIf="form.get('porcentajeComision')?.errors?.['required']">
-                El porcentaje de comisión es requerido
-              </div>
-              <div class="invalid-feedback" *ngIf="form.get('porcentajeComision')?.errors?.['min']">
-                El porcentaje mínimo es 0
-              </div>
-              <div class="invalid-feedback" *ngIf="form.get('porcentajeComision')?.errors?.['max']">
-                El porcentaje máximo es 100
-              </div>
-            </div>
-  
-            <!-- Notas -->
-            <div class="col-12 mb-3">
-              <label for="notas" class="form-label">Notas</label>
-              <textarea
-                class="form-control"
-                id="notas"
-                formControlName="notas"
-                rows="3"
-              ></textarea>
-            </div>
-          </div>
-  
-          <!-- Buttons -->
-          <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-secondary" (click)="onCancel()">
-              Cancelar
-            </button>
-            <button type="submit" class="btn btn-primary" [disabled]="loading">
-              {{isEditing ? 'Actualizar' : 'Crear'}}
-            </button>
-          </div>
-        </form>
-      </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h2>{{isEditing ? 'Editar' : 'Nuevo'}} Presentador</h2>
     </div>
   </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="text-center py-5" *ngIf="loading">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+
+      <div class="row mb-4" *ngIf="isEditing && presentador">
+        <div class="col-12">
+          <div class="card bg-light">
+            <div class="card-body">
+              <h5 class="card-title">Información de Estado</h5>
+              <div class="row">
+                <div class="col-md-4">
+                  <p class="mb-1"><strong>Estado Actual:</strong></p>
+                  <span class="badge" [ngClass]="getEstadoClass(presentador.estado)">
+                    {{presentador.estado}}
+                  </span>
+                </div>
+                <div class="col-md-4">
+                  <p class="mb-1"><strong>Última Actualización:</strong></p>
+                  <span>{{formatFecha(presentador.ultimaActualizacion)}}</span>
+                </div>
+                <div class="col-md-4">
+                  <p class="mb-1"><strong>Fecha Alta:</strong></p>
+                  <span>{{formatFecha(presentador.fechaAlta)}}</span>
+                </div>
+                <div class="col-12 mt-3" *ngIf="presentador.motivoEstado">
+                  <p class="mb-1"><strong>Motivo del último cambio:</strong></p>
+                  <p class="mb-0">{{presentador.motivoEstado}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loading">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Nombre *</label>
+            <input type="text" class="form-control" formControlName="nombre"
+                   [ngClass]="{'is-invalid': form.get('nombre')?.touched && form.get('nombre')?.invalid}">
+            <div class="invalid-feedback" *ngIf="form.get('nombre')?.errors?.['required']">
+              El nombre es requerido
+            </div>
+            <div class="invalid-feedback" *ngIf="form.get('nombre')?.errors?.['maxlength']">
+              El nombre no puede exceder los 100 caracteres
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Apellido *</label>
+            <input type="text" class="form-control" formControlName="apellido"
+                   [ngClass]="{'is-invalid': form.get('apellido')?.touched && form.get('apellido')?.invalid}">
+            <div class="invalid-feedback" *ngIf="form.get('apellido')?.errors?.['required']">
+              El apellido es requerido
+            </div>
+            <div class="invalid-feedback" *ngIf="form.get('apellido')?.errors?.['maxlength']">
+              El apellido no puede exceder los 100 caracteres
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Email *</label>
+            <input type="email" class="form-control" formControlName="email"
+                   [ngClass]="{'is-invalid': form.get('email')?.touched && form.get('email')?.invalid}">
+            <div class="invalid-feedback" *ngIf="form.get('email')?.errors?.['required']">
+              El email es requerido
+            </div>
+            <div class="invalid-feedback" *ngIf="form.get('email')?.errors?.['email']">
+              Ingrese un email válido
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Teléfono *</label>
+            <input type="text" class="form-control" formControlName="telefono"
+                   [ngClass]="{'is-invalid': form.get('telefono')?.touched && form.get('telefono')?.invalid}">
+            <div class="invalid-feedback" *ngIf="form.get('telefono')?.errors?.['required']">
+              El teléfono es requerido
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Documento de Identidad *</label>
+            <input type="text" class="form-control" formControlName="documentoIdentidad"
+                   [ngClass]="{'is-invalid': form.get('documentoIdentidad')?.touched && form.get('documentoIdentidad')?.invalid}">
+            <div class="invalid-feedback" *ngIf="form.get('documentoIdentidad')?.errors?.['required']">
+              El documento de identidad es requerido
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Porcentaje de Comisión *</label>
+            <input type="number" class="form-control" formControlName="porcentajeComision"
+                   [ngClass]="{'is-invalid': form.get('porcentajeComision')?.touched && form.get('porcentajeComision')?.invalid}">
+            <div class="invalid-feedback" *ngIf="form.get('porcentajeComision')?.errors?.['required']">
+              El porcentaje de comisión es requerido
+            </div>
+            <div class="invalid-feedback" *ngIf="form.get('porcentajeComision')?.errors?.['min']">
+              El porcentaje mínimo es 0
+            </div>
+            <div class="invalid-feedback" *ngIf="form.get('porcentajeComision')?.errors?.['max']">
+              El porcentaje máximo es 100
+            </div>
+          </div>
+
+          <div class="col-12 mb-3">
+            <label class="form-label">Notas</label>
+            <textarea class="form-control" formControlName="notas" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || loading">
+            {{isEditing ? 'Actualizar' : 'Crear'}}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

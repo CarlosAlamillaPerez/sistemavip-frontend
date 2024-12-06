@@ -73,4 +73,40 @@ export class AlertService {
       }
     });
   }
+
+  confirmCambioEstado(
+    title: string,
+    text: string,
+    callback: (motivo: string) => void,
+    options: {
+      confirmButtonText?: string;
+      cancelButtonText?: string;
+      inputLabel?: string;
+      inputPlaceholder?: string;
+    } = {}
+  ): void {
+    Swal.fire({
+      icon: 'warning',
+      title,
+      text,
+      input: 'textarea',
+      inputLabel: options.inputLabel || 'Motivo',
+      inputPlaceholder: options.inputPlaceholder || 'Ingrese el motivo del cambio de estado',
+      inputValidator: (value) => {
+        if (!value?.trim()) {
+          return 'El motivo es requerido';
+        }
+        return null;
+      },
+      showCancelButton: true,
+      confirmButtonColor: '#198754',
+      cancelButtonColor: '#dc3545',
+      confirmButtonText: options.confirmButtonText || 'Confirmar',
+      cancelButtonText: options.cancelButtonText || 'Cancelar'
+    }).then(result => {
+      if (result.isConfirmed && callback) {
+        callback(result.value);
+      }
+    });
+  }
 }

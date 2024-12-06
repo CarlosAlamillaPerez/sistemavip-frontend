@@ -1,64 +1,82 @@
 <div class="container-fluid">
-    <div class="row mb-4">
-      <div class="col">
-        <h2>Nueva Asignación</h2>
-      </div>
-    </div>
-  
-    <div class="card">
-      <div class="card-body">
-        <div class="text-center py-5" *ngIf="loading">
-          <div class="spinner-border" role="status">
-            <span class="visually-hidden">Cargando...</span>
-          </div>
-        </div>
-  
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loading">
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="terapeutaId" class="form-label">Terapeuta *</label>
-              <select 
-                id="terapeutaId"
-                class="form-select"
-                formControlName="terapeutaId"
-                [class.is-invalid]="form.get('terapeutaId')?.invalid && form.get('terapeutaId')?.touched">
-                <option value="">Seleccione un terapeuta</option>
-                <option *ngFor="let terapeuta of terapeutas" [value]="terapeuta.id">
-                  {{terapeuta.nombre}} {{terapeuta.apellido}}
-                </option>
-              </select>
-              <div class="invalid-feedback" *ngIf="form.get('terapeutaId')?.errors?.['required']">
-                Debe seleccionar un terapeuta
-              </div>
-            </div>
-  
-            <div class="col-md-6 mb-3">
-              <label for="presentadorId" class="form-label">Presentador *</label>
-              <select 
-                id="presentadorId"
-                class="form-select"
-                formControlName="presentadorId"
-                [class.is-invalid]="form.get('presentadorId')?.invalid && form.get('presentadorId')?.touched">
-                <option value="">Seleccione un presentador</option>
-                <option *ngFor="let presentador of presentadores" [value]="presentador.id">
-                  {{presentador.nombre}} {{presentador.apellido}}
-                </option>
-              </select>
-              <div class="invalid-feedback" *ngIf="form.get('presentadorId')?.errors?.['required']">
-                Debe seleccionar un presentador
-              </div>
-            </div>
-          </div>
-  
-          <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-secondary" (click)="onCancel()">
-              Cancelar
-            </button>
-            <button type="submit" class="btn btn-primary" [disabled]="loading">
-              Crear Asignación
-            </button>
-          </div>
-        </form>
-      </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Nueva Asignación</h2>
     </div>
   </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="text-center py-5" *ngIf="loading">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loading">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Terapeuta *</label>
+            <select class="form-select" formControlName="terapeutaId"
+                    [ngClass]="{'is-invalid': form.get('terapeutaId')?.touched && form.get('terapeutaId')?.invalid}">
+              <option value="">Seleccione una terapeuta</option>
+              <option *ngFor="let terapeuta of terapeutas" [value]="terapeuta.id">
+                {{terapeuta.nombre}} {{terapeuta.apellido}}
+                <ng-container *ngIf="terapeuta.estado !== 'ACTIVO'">
+                  ({{terapeuta.estado}})
+                </ng-container>
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="form.get('terapeutaId')?.errors?.['required']">
+              Debe seleccionar una terapeuta
+            </div>
+            <small class="text-info" *ngIf="terapeutaSeleccionada">
+              Estado: <span [class]="'badge ' + (terapeutaSeleccionada.estado === 'ACTIVO' ? 'bg-success' : 'bg-warning')">
+                {{terapeutaSeleccionada.estado}}
+              </span>
+            </small>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Presentador *</label>
+            <select class="form-select" formControlName="presentadorId"
+                    [ngClass]="{'is-invalid': form.get('presentadorId')?.touched && form.get('presentadorId')?.invalid}">
+              <option value="">Seleccione un presentador</option>
+              <option *ngFor="let presentador of presentadores" [value]="presentador.id">
+                {{presentador.nombre}} {{presentador.apellido}}
+                <ng-container *ngIf="presentador.estado !== 'ACTIVO'">
+                  ({{presentador.estado}})
+                </ng-container>
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="form.get('presentadorId')?.errors?.['required']">
+              Debe seleccionar un presentador
+            </div>
+            <small class="text-info" *ngIf="presentadorSeleccionado">
+              Estado: <span [class]="'badge ' + (presentadorSeleccionado.estado === 'ACTIVO' ? 'bg-success' : 'bg-warning')">
+                {{presentadorSeleccionado.estado}}
+              </span>
+            </small>
+          </div>
+        </div>
+
+        <div class="alert alert-info mt-3" *ngIf="terapeutaSeleccionada && presentadorSeleccionado">
+          <p class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            Está por asignar a <strong>{{terapeutaSeleccionada.nombre}} {{terapeutaSeleccionada.apellido}}</strong>
+            al presentador <strong>{{presentadorSeleccionado.nombre}} {{presentadorSeleccionado.apellido}}</strong>
+          </p>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || loading">
+            Crear Asignación
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

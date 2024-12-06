@@ -5,7 +5,9 @@ import { environment } from '@env/environment';
 import { 
   Presentador, 
   CreatePresentadorRequest, 
-  UpdatePresentadorRequest 
+  UpdatePresentadorRequest,
+  CambioEstadoPresentadorRequest,
+  EstadoPresentador
 } from '@core/interfaces/presentador.interface';
 
 @Injectable({
@@ -36,14 +38,12 @@ export class PresentadorService {
     return this.http.put<Presentador>(`${this.apiUrl}/${id}`, data);
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
-  updateEstado(id: number, estado: string): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${id}/estado`, JSON.stringify(estado), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+  cambiarEstado(id: number, cambioEstado: CambioEstadoPresentadorRequest): Observable<void> {
+    return this.http.patch<void>(
+      `${this.apiUrl}/${id}/estado`,
+      cambioEstado,
+      { headers: { 'Content-Type': 'application/json' } }
+    );
   }
 
   updateComision(id: number, nuevoPorcentaje: number): Observable<void> {

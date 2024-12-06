@@ -8,6 +8,9 @@ import { PresentadorService } from '@core/services/presentador.service';
 import { AlertService } from '@core/services/alert.service';
 import { Terapeuta } from '@core/interfaces/terapeuta.interface';
 import { Presentador } from '@core/interfaces/presentador.interface';
+import { EstadoTerapeuta } from '@core/interfaces/terapeuta.interface';
+import { EstadoPresentador } from '@core/interfaces/presentador.interface';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-form-asignacion',
@@ -21,6 +24,8 @@ export class FormAsignacionComponent implements OnInit {
   loading = false;
   terapeutas: Terapeuta[] = [];
   presentadores: Presentador[] = [];
+  terapeutaSeleccionada?: Terapeuta;
+  presentadorSeleccionado?: Presentador;
 
   constructor(
     private fb: FormBuilder,
@@ -34,45 +39,76 @@ export class FormAsignacionComponent implements OnInit {
       terapeutaId: ['', [Validators.required]],
       presentadorId: ['', [Validators.required]]
     });
+
+    // Suscribirse a cambios en los selectores
+    this.form.get('terapeutaId')?.valueChanges.subscribe(id => {
+      this.terapeutaSeleccionada = this.terapeutas.find(t => t.id === id);
+    });
+
+    this.form.get('presentadorId')?.valueChanges.subscribe(id => {
+      this.presentadorSeleccionado = this.presentadores.find(p => p.id === id);
+    });
   }
 
   ngOnInit(): void {
-    this.loadTerapeutas();
-    this.loadPresentadores();
+    this.loadData();
   }
 
-  private loadTerapeutas(): void {
+  private loadData(): void {
     this.loading = true;
-    this.terapeutaService.getActivos().subscribe({
+    forkJoin({
+      terapeutas: this.terapeutaService.getActivos(),
+      presentadores: this.presentadorService.getActivos()
+    }).subscribe({
       next: (data) => {
-        this.terapeutas = data;
+        this.terapeutas = data.terapeutas;
+        this.presentadores = data.presentadores;
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error al cargar terapeutas:', error);
-        this.alertService.error('Error', 'No se pudieron cargar los terapeutas');
+        console.error('Error al cargar datos:', error);
+        this.alertService.error('Error', 'No se pudieron cargar los datos necesarios');
         this.loading = false;
       }
     });
   }
 
-  private loadPresentadores(): void {
-    this.presentadorService.getActivos().subscribe({
-      next: (data) => {
-        this.presentadores = data;
-      },
-      error: (error) => {
-        console.error('Error al cargar presentadores:', error);
-        this.alertService.error('Error', 'No se pudieron cargar los presentadores');
-      }
-    });
+  private validarAsignacion(): boolean {
+    if (!this.terapeutaSeleccionada || !this.presentadorSeleccionado) {
+      return false;
+    }
+
+    // Validar estado de terapeuta
+    if (this.terapeutaSeleccionada.estado !== EstadoTerapeuta.ACTIVO) {
+      this.alertService.warning(
+        'Terapeuta No Disponible',
+        'La terapeuta seleccionada no está activa en el sistema'
+      );
+      return false;
+    }
+
+    // Validar estado de presentador
+    if (this.presentadorSeleccionado.estado !== EstadoPresentador.ACTIVO) {
+      this.alertService.warning(
+        'Presentador No Disponible',
+        'El presentador seleccionado no está activo en el sistema'
+      );
+      return false;
+    }
+
+    return true;
   }
 
   onSubmit(): void {
     if (this.form.valid && !this.loading) {
-      this.loading = true;
+      if (!this.validarAsignacion()) {
+        return;
+      }
 
-      this.terapeutaPresentadorService.asignar(this.form.value).subscribe({
+      this.loading = true;
+      const data = this.form.value;
+
+      this.terapeutaPresentadorService.asignar(data).subscribe({
         next: () => {
           this.alertService.success(
             '¡Éxito!',
@@ -93,7 +129,7 @@ export class FormAsignacionComponent implements OnInit {
       this.form.markAllAsTouched();
       this.alertService.warning(
         'Formulario Inválido',
-        'Por favor, seleccione un terapeuta y un presentador'
+        'Por favor, seleccione una terapeuta y un presentador'
       );
     }
   }

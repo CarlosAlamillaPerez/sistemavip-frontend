@@ -4,7 +4,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { TerapeutaService } from '@core/services/terapeuta.service';
 import { AlertService } from '@core/services/alert.service';
-import { CreateTerapeutaRequest, UpdateTerapeutaRequest, Terapeuta } from '@core/interfaces/terapeuta.interface';
+import { 
+  CreateTerapeutaRequest, 
+  UpdateTerapeutaRequest, 
+  Terapeuta,
+  EstadoTerapeuta 
+} from '@core/interfaces/terapeuta.interface';
 
 @Component({
   selector: 'app-form-terapeuta',
@@ -18,6 +23,8 @@ export class FormTerapeutaComponent implements OnInit {
   loading = false;
   isEditing = false;
   terapeutaId?: number;
+  terapeuta?: Terapeuta;
+  estadosTerapeuta = EstadoTerapeuta;
 
   constructor(
     private fb: FormBuilder,
@@ -54,6 +61,7 @@ export class FormTerapeutaComponent implements OnInit {
     this.loading = true;
     this.terapeutaService.getById(this.terapeutaId).subscribe({
       next: (terapeuta) => {
+        this.terapeuta = terapeuta;
         this.form.patchValue({
           nombre: terapeuta.nombre,
           apellido: terapeuta.apellido,
@@ -72,7 +80,7 @@ export class FormTerapeutaComponent implements OnInit {
         console.error('Error al cargar terapeuta:', error);
         this.alertService.error(
           'Error',
-          'No se pudo cargar la información del terapeuta',
+          'No se pudo cargar la información de la terapeuta',
           () => this.router.navigate(['/admin/personal/terapeutas'])
         );
       }
@@ -81,6 +89,23 @@ export class FormTerapeutaComponent implements OnInit {
 
   private formatDate(date: Date): string {
     return new Date(date).toISOString().split('T')[0];
+  }
+
+  getEstadoClass(estado: string): string {
+    switch (estado) {
+      case EstadoTerapeuta.ACTIVO:
+        return 'text-success';
+      case EstadoTerapeuta.INACTIVO:
+        return 'text-danger';
+      case EstadoTerapeuta.SUSPENDIDO:
+        return 'text-warning';
+      default:
+        return 'text-secondary';
+    }
+  }
+
+  formatFecha(fecha: Date): string {
+    return new Date(fecha).toLocaleString();
   }
 
   onSubmit(): void {
@@ -108,7 +133,7 @@ export class FormTerapeutaComponent implements OnInit {
       next: () => {
         this.alertService.success(
           '¡Éxito!',
-          'Terapeuta creado correctamente',
+          'Terapeuta creada correctamente',
           () => this.router.navigate(['/admin/personal/terapeutas'])
         );
       },
@@ -116,7 +141,7 @@ export class FormTerapeutaComponent implements OnInit {
         console.error('Error al crear terapeuta:', error);
         this.alertService.error(
           'Error',
-          'No se pudo crear el terapeuta'
+          'No se pudo crear la terapeuta'
         );
         this.loading = false;
       }
@@ -132,7 +157,7 @@ export class FormTerapeutaComponent implements OnInit {
       next: () => {
         this.alertService.success(
           '¡Éxito!',
-          'Terapeuta actualizado correctamente',
+          'Terapeuta actualizada correctamente',
           () => this.router.navigate(['/admin/personal/terapeutas'])
         );
       },
@@ -140,7 +165,7 @@ export class FormTerapeutaComponent implements OnInit {
         console.error('Error al actualizar terapeuta:', error);
         this.alertService.error(
           'Error',
-          'No se pudo actualizar el terapeuta'
+          'No se pudo actualizar la terapeuta'
         );
         this.loading = false;
       }

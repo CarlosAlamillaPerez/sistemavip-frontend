@@ -2,10 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TerapeutaPresentadorService } from '@core/services/terapeuta-presentador.service';
-import { TerapeutaPresentador } from '@core/interfaces/terapeuta-presentador.interface';
 import { AlertService } from '@core/services/alert.service';
 import { AuthService } from '@core/services/auth.service';
 import { UserRole } from '@core/interfaces/user.interface';
+import { 
+  TerapeutaPresentador, 
+  EstadoAsignacion,
+  CambioEstadoAsignacionRequest 
+} from '@core/interfaces/terapeuta-presentador.interface';
 
 @Component({
   selector: 'app-lista-asignaciones',
@@ -18,6 +22,7 @@ export class ListaAsignacionesComponent implements OnInit {
   asignaciones: TerapeutaPresentador[] = [];
   loading = false;
   isSuperAdmin = false;
+  estadosAsignacion = EstadoAsignacion;
 
   constructor(
     private terapeutaPresentadorService: TerapeutaPresentadorService,
@@ -60,25 +65,55 @@ export class ListaAsignacionesComponent implements OnInit {
     this.router.navigate([`/admin/personal/asignaciones/presentador/${presentadorId}`]);
   }
 
-  onUpdateEstado(terapeutaId: number, presentadorId: number, nuevoEstado: string): void {
-    this.alertService.confirm(
-      '¿Está seguro?',
-      `¿Desea cambiar el estado de la asignación a ${nuevoEstado}?`,
-      () => {
+  onCambiarEstado(terapeutaId: number, presentadorId: number, nuevoEstado: EstadoAsignacion): void {
+    const isInactivacion = nuevoEstado === EstadoAsignacion.INACTIVO;
+    
+    this.alertService.confirmCambioEstado(
+      'Cambio de Estado',
+      `¿Está seguro que desea ${isInactivacion ? 'finalizar' : 'cambiar el estado de'} esta asignación?`,
+      (motivo: string) => {
+        const cambioEstado: CambioEstadoAsignacionRequest = {
+          estado: nuevoEstado,
+          motivoEstado: motivo
+        };
+
         this.terapeutaPresentadorService
-          .updateEstado(terapeutaId, presentadorId, nuevoEstado)
+          .cambiarEstado(terapeutaId, presentadorId, cambioEstado)
           .subscribe({
             next: () => {
-              this.alertService.success('¡Éxito!', 'Estado actualizado correctamente', () =>
-                this.loadAsignaciones()
+              this.alertService.success(
+                '¡Éxito!',
+                `Asignación ${isInactivacion ? 'finalizada' : 'actualizada'} correctamente`,
+                () => this.loadAsignaciones()
               );
             },
             error: (error) => {
               console.error('Error al actualizar estado:', error);
-              this.alertService.error('Error', 'No se pudo actualizar el estado de la asignación');
+              this.alertService.error(
+                'Error',
+                'No se pudo actualizar el estado de la asignación'
+              );
             }
           });
+      },
+      {
+        inputLabel: isInactivacion ? 'Motivo de finalización' : 'Motivo del cambio',
+        inputPlaceholder: isInactivacion ? 'Ingrese el motivo de la finalización' : 'Ingrese el motivo del cambio de estado',
+        confirmButtonText: isInactivacion ? 'Finalizar asignación' : 'Cambiar estado',
       }
     );
+  }
+
+  getEstadoClass(estado: string): string {
+    switch (estado) {
+      case EstadoAsignacion.ACTIVO:
+        return 'bg-success';
+      case EstadoAsignacion.INACTIVO:
+        return 'bg-danger';
+      case EstadoAsignacion.SUSPENDIDO:
+        return 'bg-warning';
+      default:
+        return 'bg-secondary';
+    }
   }
 }

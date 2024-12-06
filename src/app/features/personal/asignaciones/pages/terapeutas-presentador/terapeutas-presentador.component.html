@@ -1,61 +1,91 @@
 <div class="container-fluid">
-    <div class="row mb-4">
-      <div class="col">
-        <h2>
-          Terapeutas asignados a {{presentador?.nombre}} {{presentador?.apellido}}
-        </h2>
-      </div>
-      <div class="col-auto">
-        <button class="btn btn-secondary" (click)="onBack()">
-          Volver
-        </button>
-      </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h2>
+        Terapeutas asignadas a 
+        <span class="text-primary">{{presentador?.nombre}} {{presentador?.apellido}}</span>
+      </h2>
     </div>
-  
-    <div class="card">
-      <div class="card-body">
-        <div class="text-center py-5" *ngIf="loading">
-          <div class="spinner-border" role="status">
-            <span class="visually-hidden">Cargando...</span>
-          </div>
+    <div class="col-auto">
+      <button class="btn btn-secondary" (click)="onBack()">
+        <i class="fas fa-arrow-left me-2"></i>Volver
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="text-center py-5" *ngIf="loading">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Cargando...</span>
         </div>
-  
-        <div class="table-responsive" *ngIf="!loading">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Teléfono</th>
-                <th>Email</th>
-                <th>Estado</th>
-                <th>Fecha Asignación</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let terapeuta of terapeutas">
-                <td>{{terapeuta.nombreCompleto}}</td>
-                <td>{{terapeuta.telefono}}</td>
-                <td>{{terapeuta.email}}</td>
-                <td>
-                  <span class="badge" 
-                        [ngClass]="{
-                          'bg-warning': terapeuta.estado === 'Pendiente',
-                          'bg-success': terapeuta.estado === 'Confirmado',
-                          'bg-info': terapeuta.estado === 'EnProceso',
-                          'bg-primary': terapeuta.estado === 'Finalizado',
-                          'bg-danger': ['Cancelado', 'NoRealizado'].includes(terapeuta.estado)
-                        }">
-                    {{terapeuta.estado}}
-                  </span>
-                </td>
-                <td>{{terapeuta.fechaAsignacion | date:'dd/MM/yyyy'}}</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="text-center py-5" *ngIf="!loading && terapeutas.length === 0">
-            Este presentador no tiene terapeutas asignados
-          </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!loading">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Terapeuta</th>
+              <th>Teléfono</th>
+              <th>Email</th>
+              <th>Fecha Asignación</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let terapeuta of terapeutas">
+              <td>{{terapeuta.nombreCompleto}}</td>
+              <td>{{terapeuta.telefono}}</td>
+              <td>{{terapeuta.email}}</td>
+              <td>{{terapeuta.fechaAsignacion | date:'dd/MM/yyyy'}}</td>
+              <td>
+                <span class="badge" [ngClass]="getEstadoClass(terapeuta.estado)">
+                  {{terapeuta.estado}}
+                </span>
+                <small class="d-block text-muted" *ngIf="terapeuta.motivoEstado">
+                  {{terapeuta.motivoEstado}}
+                </small>
+              </td>
+              <td>
+                <div class="dropdown">
+                  <button 
+                    class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    Estado
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li *ngIf="terapeuta.estado !== estadosAsignacion.ACTIVO">
+                      <a class="dropdown-item" href="javascript:void(0)"
+                         (click)="onCambiarEstado(terapeuta.terapeutaId, estadosAsignacion.ACTIVO)">
+                        <i class="fas fa-check-circle text-success me-2"></i>Activar
+                      </a>
+                    </li>
+                    <li *ngIf="terapeuta.estado !== estadosAsignacion.INACTIVO">
+                      <a class="dropdown-item" href="javascript:void(0)"
+                         (click)="onCambiarEstado(terapeuta.terapeutaId, estadosAsignacion.INACTIVO)">
+                        <i class="fas fa-times-circle text-danger me-2"></i>Finalizar
+                      </a>
+                    </li>
+                    <li *ngIf="terapeuta.estado !== estadosAsignacion.SUSPENDIDO">
+                      <a class="dropdown-item" href="javascript:void(0)"
+                         (click)="onCambiarEstado(terapeuta.terapeutaId, estadosAsignacion.SUSPENDIDO)">
+                        <i class="fas fa-pause-circle text-warning me-2"></i>Suspender
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="text-center py-5" *ngIf="!loading && terapeutas.length === 0">
+          <p class="text-muted mb-0">Este presentador no tiene terapeutas asignadas</p>
         </div>
       </div>
     </div>
   </div>
+</div>

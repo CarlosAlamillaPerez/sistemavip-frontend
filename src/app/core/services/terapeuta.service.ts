@@ -6,7 +6,9 @@ import {
   Terapeuta, 
   CreateTerapeutaRequest, 
   UpdateTerapeutaRequest,
-  UpdateTarifasRequest
+  UpdateTarifasRequest,
+  CambioEstadoTerapeutaRequest,
+  EstadoTerapeuta
 } from '@core/interfaces/terapeuta.interface';
 
 @Injectable({
@@ -37,14 +39,12 @@ export class TerapeutaService {
     return this.http.put<Terapeuta>(`${this.apiUrl}/${id}`, data);
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
-  updateEstado(id: number, estado: string): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${id}/estado`, JSON.stringify(estado), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+  cambiarEstado(id: number, cambioEstado: CambioEstadoTerapeutaRequest): Observable<void> {
+    return this.http.patch<void>(
+      `${this.apiUrl}/${id}/estado`,
+      cambioEstado,
+      { headers: { 'Content-Type': 'application/json' } }
+    );
   }
 
   updateTarifas(id: number, tarifas: UpdateTarifasRequest): Observable<void> {

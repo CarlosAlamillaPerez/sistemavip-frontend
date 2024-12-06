@@ -1,69 +1,89 @@
 <div class="container-fluid">
-    <div class="row mb-4">
-      <div class="col">
-        <h2>Terapeutas</h2>
-      </div>
-      <div class="col-auto" *ngIf="isSuperAdmin">
-        <button class="btn btn-primary" (click)="onNuevo()">Nuevo Terapeuta</button>
-      </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Terapeutas</h2>
     </div>
-  
-    <div class="card">
-      <div class="card-body">
-        <div class="text-center py-5" *ngIf="loading">
-          <div class="spinner-border" role="status">
-            <span class="visually-hidden">Cargando...</span>
-          </div>
+    <div class="col-auto" *ngIf="isSuperAdmin">
+      <button class="btn btn-primary" (click)="onNuevo()">
+        <i class="fas fa-plus me-2"></i>Nueva Terapeuta
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="text-center py-5" *ngIf="loading">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Cargando...</span>
         </div>
-  
-        <div class="table-responsive" *ngIf="!loading">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Teléfono</th>
-                <th>Tarifa Base</th>
-                <th>Tarifa Extra</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let terapeuta of terapeutas">
-                <td>{{terapeuta.nombre}} {{terapeuta.apellido}}</td>
-                <td>{{terapeuta.email}}</td>
-                <td>{{terapeuta.telefono}}</td>
-                <td>${{terapeuta.tarifaBase}}</td>
-                <td>${{terapeuta.tarifaExtra}}</td>
-                <td>
-                  <span class="badge" 
-                        [ngClass]="{'bg-success': terapeuta.estado === 'Activo', 
-                                  'bg-danger': terapeuta.estado === 'Inactivo'}">
-                    {{terapeuta.estado}}
-                  </span>
-                </td>
-                <td>
-                  <div class="btn-group" role="group">
-                    <button class="btn btn-sm btn-outline-primary" (click)="onEditar(terapeuta.id)">
-                      Editar
-                    </button>
-                    <button class="btn btn-sm btn-outline-warning" 
-                            (click)="onCambiarEstado(terapeuta.id, terapeuta.estado === 'Activo' ? 'Inactivo' : 'Activo')">
-                      {{terapeuta.estado === 'Activo' ? 'Desactivar' : 'Activar'}}
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" (click)="onEliminar(terapeuta.id)">
-                      Eliminar
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="text-center py-5" *ngIf="!loading && terapeutas.length === 0">
-            No hay terapeutas registrados
-          </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!loading">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>Estatura</th>
+              <th>Tarifa Base</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let terapeuta of terapeutas">
+              <td>{{terapeuta.nombre}} {{terapeuta.apellido}}</td>
+              <td>{{terapeuta.email}}</td>
+              <td>{{terapeuta.telefono}}</td>
+              <td>{{terapeuta.estatura}}</td>
+              <td>${{terapeuta.tarifaBase}}</td>
+              <td>
+                <span class="badge" [ngClass]="getEstadoClass(terapeuta.estado)">
+                  {{terapeuta.estado}}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-primary" (click)="onEditar(terapeuta.id)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                          type="button" 
+                          data-bs-toggle="dropdown" 
+                          aria-expanded="false">
+                    Estado
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li *ngIf="terapeuta.estado !== estadosTerapeuta.ACTIVO">
+                      <a class="dropdown-item" href="javascript:void(0)" 
+                         (click)="onCambiarEstado(terapeuta.id, estadosTerapeuta.ACTIVO)">
+                        <i class="fas fa-check-circle text-success me-2"></i>Activar
+                      </a>
+                    </li>
+                    <li *ngIf="terapeuta.estado !== estadosTerapeuta.INACTIVO">
+                      <a class="dropdown-item" href="javascript:void(0)" 
+                         (click)="onCambiarEstado(terapeuta.id, estadosTerapeuta.INACTIVO)">
+                        <i class="fas fa-times-circle text-danger me-2"></i>Dar de Baja
+                      </a>
+                    </li>
+                    <li *ngIf="terapeuta.estado !== estadosTerapeuta.SUSPENDIDO">
+                      <a class="dropdown-item" href="javascript:void(0)" 
+                         (click)="onCambiarEstado(terapeuta.id, estadosTerapeuta.SUSPENDIDO)">
+                        <i class="fas fa-pause-circle text-warning me-2"></i>Suspender
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="text-center py-5" *ngIf="!loading && terapeutas.length === 0">
+          <p class="text-muted mb-0">No hay terapeutas registradas</p>
         </div>
       </div>
     </div>
   </div>
+</div>
