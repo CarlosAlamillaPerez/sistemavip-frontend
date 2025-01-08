@@ -1,15 +1,12 @@
+// src/app/features/admin/personal/presentadores/pages/form-presentador/form-presentador.component.ts
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { PresentadorService } from '@core/services/presentador.service';
 import { AlertService } from '@core/services/alert.service';
-import { 
-  CreatePresentadorRequest, 
-  UpdatePresentadorRequest, 
-  Presentador,
-  EstadoPresentador 
-} from '@core/interfaces/presentador.interface';
+import { CreatePresentadorRequest, UpdatePresentadorRequest, Presentador } from '@core/interfaces/presentador.interface';
 
 @Component({
   selector: 'app-form-presentador',
@@ -19,12 +16,10 @@ import {
   styleUrls: ['./form-presentador.component.scss']
 })
 export class FormPresentadorComponent implements OnInit {
-  form: FormGroup;
-  loading = false;
+  presentadorForm: FormGroup;
   isEditing = false;
   presentadorId?: number;
-  presentador?: Presentador;
-  estadosPresentador = EstadoPresentador;
+  loading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -33,41 +28,43 @@ export class FormPresentadorComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    this.form = this.fb.group({
-      nombre: ['', [Validators.required, Validators.maxLength(100)]],
-      apellido: ['', [Validators.required, Validators.maxLength(100)]],
-      telefono: ['', [Validators.required, Validators.maxLength(20)]],
-      email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
-      documentoIdentidad: ['', [Validators.required, Validators.maxLength(20)]],
-      porcentajeComision: [30, [Validators.required, Validators.min(0), Validators.max(100)]],
-      notas: ['']
-    });
+    this.presentadorForm = this.createForm();
   }
 
   ngOnInit(): void {
     this.presentadorId = Number(this.route.snapshot.paramMap.get('id'));
-    if (this.presentadorId) {
-      this.isEditing = true;
+    this.isEditing = !!this.presentadorId;
+
+    if (this.isEditing) {
       this.loadPresentador();
     }
   }
 
+  private createForm(): FormGroup {
+    return this.fb.group({
+      nombre: ['', [Validators.required, Validators.minLength(2)]],
+      apellido: ['', [Validators.required, Validators.minLength(2)]],
+      telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      email: ['', [Validators.required, Validators.email]],
+      documentoIdentidad: ['', [Validators.required, Validators.minLength(5)]],
+      porcentajeComision: [30, [Validators.required, Validators.min(0), Validators.max(100)]],
+      password: ['', this.isEditing ? [] : [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+      ]],
+      fotoUrl: [''],
+      notas: ['']
+    });
+  }
+
   private loadPresentador(): void {
     if (!this.presentadorId) return;
-
+  
     this.loading = true;
     this.presentadorService.getById(this.presentadorId).subscribe({
       next: (presentador) => {
-        this.presentador = presentador;
-        this.form.patchValue({
-          nombre: presentador.nombre,
-          apellido: presentador.apellido,
-          telefono: presentador.telefono,
-          email: presentador.email,
-          documentoIdentidad: presentador.documentoIdentidad,
-          porcentajeComision: presentador.porcentajeComision,
-          notas: presentador.notas
-        });
+        this.presentadorForm.patchValue(presentador);
         this.loading = false;
       },
       error: (error) => {
@@ -77,89 +74,60 @@ export class FormPresentadorComponent implements OnInit {
           'No se pudo cargar la información del presentador',
           () => this.router.navigate(['/admin/personal/presentadores'])
         );
+        this.loading = false;
       }
     });
-  }
-
-  getEstadoClass(estado: string): string {
-    switch (estado) {
-      case EstadoPresentador.ACTIVO:
-        return 'text-success';
-      case EstadoPresentador.INACTIVO:
-        return 'text-danger';
-      case EstadoPresentador.SUSPENDIDO:
-        return 'text-warning';
-      default:
-        return 'text-secondary';
-    }
-  }
-
-  formatFecha(fecha: Date): string {
-    return new Date(fecha).toLocaleString();
   }
 
   onSubmit(): void {
-    if (this.form.valid && !this.loading) {
-      this.loading = true;
+    if (this.presentadorForm.invalid || this.loading) return;
 
-      if (this.isEditing) {
-        this.updatePresentador();
-      } else {
-        this.createPresentador();
-      }
+    this.loading = true;
+    const formData = this.presentadorForm.value;
+
+    if (this.isEditing) {
+      // En edición solo enviamos los campos permitidos
+      const updateData: UpdatePresentadorRequest = {
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        telefono: formData.telefono,
+        email: formData.email,
+        fotoUrl: formData.fotoUrl,
+        notas: formData.notas
+      };
+
+      this.presentadorService.update(this.presentadorId!, updateData).subscribe({
+        next: () => this.handleSuccess('Presentador actualizado correctamente'),
+        error: (error) => this.handleError(error)
+      });
     } else {
-      this.form.markAllAsTouched();
-      this.alertService.warning(
-        'Formulario Inválido',
-        'Por favor, revise los campos marcados en rojo'
-      );
+      // En creación enviamos todos los campos
+      const createData: CreatePresentadorRequest = {
+        ...formData,
+        porcentajeComision: Number(formData.porcentajeComision)
+      };
+
+      this.presentadorService.create(createData).subscribe({
+        next: () => this.handleSuccess('Presentador creado correctamente'),
+        error: (error) => this.handleError(error)
+      });
     }
   }
 
-  private createPresentador(): void {
-    const data: CreatePresentadorRequest = this.form.value;
-
-    this.presentadorService.create(data).subscribe({
-      next: () => {
-        this.alertService.success(
-          '¡Éxito!',
-          'Presentador creado correctamente',
-          () => this.router.navigate(['/admin/personal/presentadores'])
-        );
-      },
-      error: (error) => {
-        console.error('Error al crear presentador:', error);
-        this.alertService.error(
-          'Error',
-          'No se pudo crear el presentador'
-        );
-        this.loading = false;
-      }
+  private handleSuccess(message: string): void {
+    this.loading = false;
+    this.alertService.success('¡Éxito!', message, () => {
+      this.router.navigate(['/admin/personal/presentadores']);
     });
   }
 
-  private updatePresentador(): void {
-    if (!this.presentadorId) return;
-
-    const data: UpdatePresentadorRequest = this.form.value;
-
-    this.presentadorService.update(this.presentadorId, data).subscribe({
-      next: () => {
-        this.alertService.success(
-          '¡Éxito!',
-          'Presentador actualizado correctamente',
-          () => this.router.navigate(['/admin/personal/presentadores'])
-        );
-      },
-      error: (error) => {
-        console.error('Error al actualizar presentador:', error);
-        this.alertService.error(
-          'Error',
-          'No se pudo actualizar el presentador'
-        );
-        this.loading = false;
-      }
-    });
+  private handleError(error: any): void {
+    this.loading = false;
+    console.error('Error:', error);
+    this.alertService.error(
+      'Error',
+      error.error?.message || 'Ha ocurrido un error. Por favor, intente nuevamente.'
+    );
   }
 
   onCancel(): void {

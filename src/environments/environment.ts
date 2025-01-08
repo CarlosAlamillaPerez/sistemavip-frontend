@@ -1,4 +1,5 @@
+// src/environments/environment.ts
 export const environment = {
-    production: false,
-    apiUrl: 'http://localhost:4200//api' // Ajusta esto según tu API
-  };
+  production: false,
+  apiUrl: 'https://localhost:7245/api'  // URL correcta del backend
+};

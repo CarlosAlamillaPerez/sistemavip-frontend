@@ -1,4 +1,4 @@
-// src/app/features/personal/presentadores/presentadores.routes.ts
+// src/app/features/admin/personal/presentadores/presentadores.routes.ts
 
 import { Routes } from '@angular/router';
 import { AdminGuard } from '@core/guards/admin.guard';
@@ -6,7 +6,7 @@ import { ListaPresentadoresComponent } from './pages/lista-presentadores/lista-p
 import { DetallePresentadorComponent } from './pages/detalle-presentador/detalle-presentador.component';
 import { FormPresentadorComponent } from './pages/form-presentador/form-presentador.component';
 
-export const routes: Routes = [
+export const PRESENTADORES_ROUTES: Routes = [
   {
     path: '',
     component: ListaPresentadoresComponent,
