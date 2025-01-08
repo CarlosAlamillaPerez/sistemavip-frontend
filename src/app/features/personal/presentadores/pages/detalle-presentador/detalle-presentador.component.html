@@ -1,0 +1,174 @@
+<!-- detalle-presentador.component.html -->
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4 align-items-center">
+      <div class="col">
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-link p-0" (click)="onBack()">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h2 class="mb-0">Detalle del Presentador</h2>
+        </div>
+      </div>
+      <div class="col-auto">
+        <div class="btn-group">
+          <button class="btn btn-outline-primary" (click)="onEditar()">
+            <i class="fas fa-edit me-2"></i>Editar
+          </button>
+          <button class="btn btn-outline-secondary dropdown-toggle" 
+                  *ngIf="isSuperAdmin"
+                  type="button" 
+                  data-bs-toggle="dropdown">
+            <i class="fas fa-cog me-2"></i>Acciones
+          </button>
+          <ul class="dropdown-menu">
+            <li *ngIf="presentador?.estado !== estadosPresentador.ACTIVO">
+              <a class="dropdown-item" href="javascript:void(0)" 
+                 (click)="onCambiarEstado(estadosPresentador.ACTIVO)">
+                <i class="fas fa-check-circle text-success me-2"></i>Activar
+              </a>
+            </li>
+            <li *ngIf="presentador?.estado !== estadosPresentador.SUSPENDIDO">
+              <a class="dropdown-item" href="javascript:void(0)" 
+                 (click)="onCambiarEstado(estadosPresentador.SUSPENDIDO)">
+                <i class="fas fa-pause-circle text-warning me-2"></i>Suspender
+              </a>
+            </li>
+            <li *ngIf="presentador?.estado !== estadosPresentador.INACTIVO">
+              <a class="dropdown-item" href="javascript:void(0)" 
+                 (click)="onCambiarEstado(estadosPresentador.INACTIVO)">
+                <i class="fas fa-times-circle text-danger me-2"></i>Dar de Baja
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  
+    <div class="text-center py-5" *ngIf="loading">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  
+    <ng-container *ngIf="!loading && presentador">
+      <!-- Información Principal -->
+      <div class="row">
+        <div class="col-lg-8">
+          <!-- Tarjeta de Información Personal -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-4">
+                <img [src]="presentador.fotoUrl || '/assets/img/avatar.png'" 
+                     class="rounded-circle me-3" 
+                     width="80" 
+                     height="80"
+                     [alt]="presentador.nombre">
+                <div>
+                  <h4 class="mb-1">{{presentador.nombre}} {{presentador.apellido}}</h4>
+                  <span class="badge" [ngClass]="getEstadoClass(presentador.estado)">
+                    {{presentador.estado}}
+                  </span>
+                </div>
+              </div>
+  
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="small text-muted">Email</label>
+                  <p class="mb-0">{{presentador.email}}</p>
+                </div>
+                <div class="col-md-6">
+                  <label class="small text-muted">Teléfono</label>
+                  <p class="mb-0">{{presentador.telefono}}</p>
+                </div>
+                <div class="col-md-6">
+                  <label class="small text-muted">Documento de Identidad</label>
+                  <p class="mb-0">{{presentador.documentoIdentidad}}</p>
+                </div>
+                <div class="col-md-6">
+                  <label class="small text-muted">Porcentaje de Comisión</label>
+                  <p class="mb-0">{{presentador.porcentajeComision}}%</p>
+                </div>
+                <div class="col-12" *ngIf="presentador.notas">
+                  <label class="small text-muted">Notas</label>
+                  <p class="mb-0">{{presentador.notas}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Tarjeta de Estado -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title">Información de Estado</h5>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="small text-muted">Fecha de Alta</label>
+                  <p class="mb-0">{{presentador.fechaAlta | date:'dd/MM/yyyy'}}</p>
+                </div>
+                <div class="col-md-4">
+                  <label class="small text-muted">Última Actualización</label>
+                  <p class="mb-0">{{presentador.ultimaActualizacion | date:'dd/MM/yyyy HH:mm'}}</p>
+                </div>
+                <div class="col-md-4">
+                  <label class="small text-muted">Fecha Cambio Estado</label>
+                  <p class="mb-0">{{presentador.fechaCambioEstado | date:'dd/MM/yyyy HH:mm'}}</p>
+                </div>
+                <div class="col-12" *ngIf="presentador.motivoEstado">
+                  <label class="small text-muted">Motivo del Estado Actual</label>
+                  <p class="mb-0">{{presentador.motivoEstado}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="col-lg-4">
+          <!-- Resumen -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title">Resumen</h5>
+              <div class="list-group list-group-flush">
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <i class="fas fa-users me-2 text-primary"></i>
+                    Terapeutas Asignadas
+                  </div>
+                  <span class="badge bg-primary rounded-pill">{{resumen?.terapeutasActivas || 0}}</span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <i class="fas fa-clock me-2 text-warning"></i>
+                    Servicios Pendientes
+                  </div>
+                  <span class="badge bg-warning rounded-pill">{{resumen?.serviciosActivos || 0}}</span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <i class="fas fa-dollar-sign me-2 text-success"></i>
+                    Comisiones Pendientes
+                  </div>
+                  <span class="badge bg-success rounded-pill">{{resumen?.comisionesPendientes || 0}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Acciones Rápidas -->
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Acciones Rápidas</h5>
+              <div class="d-grid gap-2">
+                <button class="btn btn-outline-primary" (click)="verTerapeutas()">
+                  <i class="fas fa-users me-2"></i>Ver Terapeutas
+                </button>
+                <button class="btn btn-outline-success" (click)="verComisiones()" *ngIf="isSuperAdmin">
+                  <i class="fas fa-money-bill me-2"></i>Ver Comisiones
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>

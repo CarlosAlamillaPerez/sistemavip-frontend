@@ -1,26 +1,27 @@
-// lista-presentadores.component.ts
+// detalle-presentador.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PresentadorService } from '@core/services/presentador.service';
-import { 
-  Presentador, 
-  EstadoPresentador, 
-  CambioEstadoPresentadorRequest 
-} from '@core/interfaces/presentador.interface';
 import { AlertService } from '@core/services/alert.service';
 import { AuthService } from '@core/services/auth.service';
-import { UserRole } from '@core/interfaces/user.interface';
+import { 
+  Presentador, 
+  EstadoPresentador,
+  CambioEstadoPresentadorRequest,
+  ResumenPresentadorDto 
+} from '@core/interfaces/presentador.interface';
 
 @Component({
-  selector: 'app-lista-presentadores',
+  selector: 'app-detalle-presentador',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './lista-presentadores.component.html',
-  styleUrls: ['./lista-presentadores.component.scss']
+  templateUrl: './detalle-presentador.component.html',
+  styleUrls: ['./detalle-presentador.component.scss']
 })
-export class ListaPresentadoresComponent implements OnInit {
-  presentadores: Presentador[] = [];
+export class DetallePresentadorComponent implements OnInit {
+  presentador?: Presentador;
+  resumen?: ResumenPresentadorDto;
   loading = false;
   isSuperAdmin = false;
   estadosPresentador = EstadoPresentador;
@@ -29,12 +30,13 @@ export class ListaPresentadoresComponent implements OnInit {
     private presentadorService: PresentadorService,
     private alertService: AlertService,
     private authService: AuthService,
+    private route: ActivatedRoute,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.checkRole();
-    this.loadPresentadores();
+    this.loadPresentador();
   }
 
   private checkRole(): void {
@@ -43,41 +45,62 @@ export class ListaPresentadoresComponent implements OnInit {
     );
   }
 
-  private loadPresentadores(): void {
+  private loadPresentador(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (!id) {
+      this.alertService.error('Error', 'ID de presentador no válido');
+      this.router.navigate(['/admin/personal/presentadores']);
+      return;
+    }
+
     this.loading = true;
-    this.presentadorService.getAll().subscribe({
-      next: (presentadores) => {
-        this.presentadores = presentadores;
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error al cargar presentadores:', error);
-        this.alertService.error(
-          'Error', 
-          'No se pudieron cargar los presentadores. Por favor, intente nuevamente.'
-        );
-        this.loading = false;
-      }
+
+    // Cargar presentador y su resumen en paralelo
+    Promise.all([
+      this.presentadorService.getById(id).toPromise(),
+      this.presentadorService.getResumen(id).toPromise()
+    ]).then(([presentador, resumen]) => {
+      this.presentador = presentador;
+      this.resumen = resumen;
+      this.loading = false;
+    }).catch(error => {
+      console.error('Error al cargar presentador:', error);
+      this.alertService.error(
+        'Error', 
+        'No se pudo cargar la información del presentador',
+        () => this.router.navigate(['/admin/personal/presentadores'])
+      );
+      this.loading = false;
     });
   }
 
-  onNuevo(): void {
-    this.router.navigate(['/admin/personal/presentadores/nuevo']);
+  onBack(): void {
+    this.router.navigate(['/admin/personal/presentadores']);
   }
 
-  onEditar(id: number): void {
-    this.router.navigate([`/admin/personal/presentadores/editar/${id}`]);
+  onEditar(): void {
+    if (this.presentador) {
+      this.router.navigate([`/admin/personal/presentadores/editar/${this.presentador.id}`]);
+    }
   }
 
-  onVerDetalle(id: number): void {
-    this.router.navigate([`/admin/personal/presentadores/${id}`]);
+  verTerapeutas(): void {
+    if (this.presentador) {
+      this.router.navigate([`/admin/personal/presentadores/${this.presentador.id}/terapeutas`]);
+    }
   }
 
-  verTerapeutas(presentadorId: number): void {
-    this.router.navigate([`/admin/personal/presentadores/${presentadorId}/terapeutas`]);
+  verComisiones(): void {
+    if (this.presentador) {
+      this.router.navigate(['/admin/comisiones'], { 
+        queryParams: { presentadorId: this.presentador.id } 
+      });
+    }
   }
 
-  onCambiarEstado(id: number, nuevoEstado: EstadoPresentador): void {
+  onCambiarEstado(nuevoEstado: EstadoPresentador): void {
+    if (!this.presentador) return;
+
     const messages = {
       [EstadoPresentador.ACTIVO]: {
         title: 'Activar Presentador',
@@ -100,7 +123,7 @@ export class ListaPresentadoresComponent implements OnInit {
     };
 
     const currentMessage = messages[nuevoEstado];
-    
+
     this.alertService.confirmCambioEstado(
       currentMessage.title,
       currentMessage.text,
@@ -110,13 +133,12 @@ export class ListaPresentadoresComponent implements OnInit {
           motivoEstado: motivo
         };
 
-        this.presentadorService.cambiarEstado(id, cambioEstado).subscribe({
+        this.presentadorService.cambiarEstado(this.presentador!.id, cambioEstado).subscribe({
           next: () => {
             this.alertService.success('¡Éxito!', currentMessage.success);
-            this.loadPresentadores();
+            this.loadPresentador();
           },
           error: (error) => {
-            // Si es un error de validación específico
             if (error.error?.code === 'VALIDACION_ESTADO') {
               this.alertService.warning(
                 'No se puede cambiar el estado', 

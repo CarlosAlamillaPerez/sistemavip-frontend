@@ -1,33 +1,32 @@
-import { Routes } from '@angular/router';
-import { UserRole } from '@core/interfaces/user.interface';
-import { RoleGuard } from '@core/guards/role.guard';
+// src/app/features/personal/presentadores/presentadores.routes.ts
 
-export const PRESENTADORES_ROUTES: Routes = [
+import { Routes } from '@angular/router';
+import { AdminGuard } from '@core/guards/admin.guard';
+import { ListaPresentadoresComponent } from './pages/lista-presentadores/lista-presentadores.component';
+import { DetallePresentadorComponent } from './pages/detalle-presentador/detalle-presentador.component';
+import { FormPresentadorComponent } from './pages/form-presentador/form-presentador.component';
+
+export const routes: Routes = [
   {
     path: '',
-    children: [
-      {
-        path: '',
-        loadComponent: () => 
-          import('./pages/lista-presentadores/lista-presentadores.component')
-          .then(m => m.ListaPresentadoresComponent),
-        title: 'Lista de Presentadores'
-      },
-      {
-        path: 'nuevo',
-        loadComponent: () => 
-          import('./pages/form-presentador/form-presentador.component')
-          .then(m => m.FormPresentadorComponent),
-        title: 'Nuevo Presentador',
-        canActivate: [RoleGuard([UserRole.SUPER_ADMIN])]
-      },
-      {
-        path: 'editar/:id',
-        loadComponent: () => 
-          import('./pages/form-presentador/form-presentador.component')
-          .then(m => m.FormPresentadorComponent),
-        title: 'Editar Presentador'
-      }
-    ]
+    component: ListaPresentadoresComponent,
+    canActivate: [AdminGuard]
+  },
+  {
+    path: 'nuevo',
+    component: FormPresentadorComponent,
+    canActivate: [AdminGuard],
+    data: { requireSuperAdmin: true }
+  },
+  {
+    path: 'editar/:id',
+    component: FormPresentadorComponent,
+    canActivate: [AdminGuard],
+    data: { requireSuperAdmin: true }
+  },
+  {
+    path: ':id',
+    component: DetallePresentadorComponent,
+    canActivate: [AdminGuard]
   }
 ];

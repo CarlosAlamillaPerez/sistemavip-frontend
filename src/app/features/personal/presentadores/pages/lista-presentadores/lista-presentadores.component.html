@@ -1,5 +1,7 @@
+<!-- lista-presentadores.component.html -->
 <div class="container-fluid">
-  <div class="row mb-4">
+  <!-- Header -->
+  <div class="row mb-4 align-items-center">
     <div class="col">
       <h2>Presentadores</h2>
     </div>
@@ -10,47 +12,81 @@
     </div>
   </div>
 
+  <!-- Card Principal -->
   <div class="card">
     <div class="card-body">
+      <!-- Loading -->
       <div class="text-center py-5" *ngIf="loading">
         <div class="spinner-border" role="status">
           <span class="visually-hidden">Cargando...</span>
         </div>
       </div>
 
+      <!-- Tabla -->
       <div class="table-responsive" *ngIf="!loading">
-        <table class="table table-hover">
-          <thead>
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
             <tr>
               <th>Nombre</th>
               <th>Email</th>
               <th>Teléfono</th>
               <th>Comisión</th>
+              <th>Terapeutas</th>
               <th>Estado</th>
+              <th>Última Actualización</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let presentador of presentadores">
-              <td>{{presentador.nombre}} {{presentador.apellido}}</td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <img [src]="presentador.fotoUrl || '/assets/img/avatar.png'" 
+                       class="rounded-circle me-2" 
+                       width="40" 
+                       height="40"
+                       [alt]="presentador.nombre">
+                  <div>
+                    <div>{{presentador.nombre}} {{presentador.apellido}}</div>
+                    <small class="text-muted">ID: {{presentador.id}}</small>
+                  </div>
+                </div>
+              </td>
               <td>{{presentador.email}}</td>
               <td>{{presentador.telefono}}</td>
               <td>{{presentador.porcentajeComision}}%</td>
               <td>
-                <span class="badge" [ngClass]="getEstadoClass(presentador.estado)">
+                <a href="javascript:void(0)" 
+                   (click)="verTerapeutas(presentador.id)"
+                   class="text-decoration-none">
+                  Ver Terapeutas
+                </a>
+              </td>
+              <td>
+                <span class="badge rounded-pill" [ngClass]="getEstadoClass(presentador.estado)">
                   {{presentador.estado}}
                 </span>
               </td>
+              <td>{{presentador.ultimaActualizacion | date:'dd/MM/yyyy HH:mm'}}</td>
               <td>
                 <div class="btn-group">
-                  <button class="btn btn-sm btn-outline-primary" (click)="onEditar(presentador.id)">
+                  <button class="btn btn-sm btn-outline-primary" 
+                          (click)="onVerDetalle(presentador.id)" 
+                          title="Ver Detalle">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary"
+                          (click)="onEditar(presentador.id)"
+                          title="Editar">
                     <i class="fas fa-edit"></i>
                   </button>
                   <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                          *ngIf="isSuperAdmin"
                           type="button" 
                           data-bs-toggle="dropdown" 
-                          aria-expanded="false">
-                    Estado
+                          aria-expanded="false"
+                          title="Cambiar Estado">
+                    <i class="fas fa-sync-alt"></i>
                   </button>
                   <ul class="dropdown-menu">
                     <li *ngIf="presentador.estado !== estadosPresentador.ACTIVO">
@@ -59,16 +95,16 @@
                         <i class="fas fa-check-circle text-success me-2"></i>Activar
                       </a>
                     </li>
-                    <li *ngIf="presentador.estado !== estadosPresentador.INACTIVO">
-                      <a class="dropdown-item" href="javascript:void(0)" 
-                         (click)="onCambiarEstado(presentador.id, estadosPresentador.INACTIVO)">
-                        <i class="fas fa-times-circle text-danger me-2"></i>Dar de Baja
-                      </a>
-                    </li>
                     <li *ngIf="presentador.estado !== estadosPresentador.SUSPENDIDO">
                       <a class="dropdown-item" href="javascript:void(0)" 
                          (click)="onCambiarEstado(presentador.id, estadosPresentador.SUSPENDIDO)">
                         <i class="fas fa-pause-circle text-warning me-2"></i>Suspender
+                      </a>
+                    </li>
+                    <li *ngIf="presentador.estado !== estadosPresentador.INACTIVO">
+                      <a class="dropdown-item" href="javascript:void(0)" 
+                         (click)="onCambiarEstado(presentador.id, estadosPresentador.INACTIVO)">
+                        <i class="fas fa-times-circle text-danger me-2"></i>Dar de Baja
                       </a>
                     </li>
                   </ul>
@@ -78,7 +114,9 @@
           </tbody>
         </table>
 
+        <!-- Empty State -->
         <div class="text-center py-5" *ngIf="!loading && presentadores.length === 0">
+          <i class="fas fa-users fa-3x text-muted mb-3"></i>
           <p class="text-muted mb-0">No hay presentadores registrados</p>
         </div>
       </div>

@@ -1,11 +1,13 @@
-// Estado enum para usar en la interfaz
-export enum EstadoPresentador {
-  ACTIVO = 'ACTIVO',
-  INACTIVO = 'INACTIVO',
-  SUSPENDIDO = 'SUSPENDIDO'
-}
+// presentador.interface.ts
 
-export interface Presentador {
+export enum EstadoPresentador {
+    ACTIVO = 'ACTIVO',
+    INACTIVO = 'INACTIVO',
+    SUSPENDIDO = 'SUSPENDIDO'
+  }
+  
+  // Interfaz principal de Presentador
+  export interface Presentador {
     id: number;
     userId: string;
     nombre: string;
@@ -21,29 +23,57 @@ export interface Presentador {
     fotoUrl?: string;
     ultimaActualizacion: Date;
     notas?: string;
-}
-
-export interface CreatePresentadorRequest {
+  }
+  
+  // DTO para crear presentador
+  export interface CreatePresentadorRequest {
     nombre: string;
     apellido: string;
     telefono: string;
     email: string;
+    password: string;  // Requerido para crear usuario en Identity
     porcentajeComision: number;
     documentoIdentidad: string;
     fotoUrl?: string;
     notas?: string;
-}
-
-export interface UpdatePresentadorRequest {
+  }
+  
+  // DTO para actualizar presentador
+  export interface UpdatePresentadorRequest {
     nombre?: string;
     apellido?: string;
     telefono?: string;
     email?: string;
     fotoUrl?: string;
     notas?: string;
-}
-
-export interface CambioEstadoPresentadorRequest {
+  }
+  
+  // DTO para cambio de estado
+  export interface CambioEstadoPresentadorRequest {
     estado: EstadoPresentador;
-    motivoEstado?: string;
-}
+    motivoEstado: string; // Requerido siempre
+  }
+  
+  // DTO para actualizar comisión
+  export interface UpdateComisionRequest {
+    nuevoPorcentaje: number;
+  }
+  
+  // Respuesta de resumen del presentador
+  export interface ResumenPresentadorDto {
+    id: number;
+    nombre: string;
+    apellido: string;
+    email: string;
+    estado: EstadoPresentador;
+    serviciosActivos: number;
+    terapeutasActivas: number;
+    comisionesPendientes: number;
+    ultimaActualizacion: Date;
+  }
+  
+  // Para manejar errores específicos del backend
+  export interface PresentadorError {
+    code: 'VALIDACION_ESTADO' | 'ERROR_INTERNO';
+    message: string;
+  }
