@@ -1,3 +1,4 @@
+// app.routes.ts modificado
 import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 import { UserRole } from './core/interfaces/user.interface';
@@ -27,16 +28,6 @@ export const routes: Routes = [
           .then(m => m.PRESENTADORES_ROUTES)
       },
       {
-        path: 'terapeutas',
-        loadChildren: () => import('./features/personal/terapeutas/terapeutas.routes')
-          .then(m => m.TERAPEUTAS_ROUTES)
-      },
-      {
-        path: 'asignaciones',
-        loadChildren: () => import('./features/personal/asignaciones/asignaciones.routes')
-          .then(m => m.ASIGNACIONES_ROUTES)
-      },
-      {
         path: '',
         redirectTo: 'presentadores',
         pathMatch: 'full'
@@ -45,27 +36,11 @@ export const routes: Routes = [
   },
   {
     path: '',
-    component: UserLayoutComponent,
-    canActivate: [AuthGuard],
-    children: [
-      {
-        path: 'servicios',
-        loadChildren: () => import('./features/servicios/servicios.routes').then(m => m.SERVICIOS_ROUTES)
-      },
-      // {
-      //   path: 'blacklist',
-      //   loadChildren: () => import('./features/blacklist/blacklist.routes').then(m => m.BLACKLIST_ROUTES),
-      //   canActivate: [RoleGuard([UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PRESENTADOR])]
-      // },
-      {
-        path: '',
-        redirectTo: 'servicios',
-        pathMatch: 'full'
-      }
-    ]
+    redirectTo: 'auth/login',
+    pathMatch: 'full'
   },
   {
     path: '**',
-    redirectTo: ''
+    redirectTo: 'auth/login'
   }
 ];

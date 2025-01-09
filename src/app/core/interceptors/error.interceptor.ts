@@ -17,7 +17,7 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
       if (error.status === 401) {
         // Limpiar token y redirigir a login
         localStorage.removeItem('token');
-        router.navigate(['/auth/login']);
+        router.navigate(['/Auth/login']);
       }
 
       return throwError(() => error);

@@ -13,7 +13,7 @@ export const RoleGuard = (allowedRoles: UserRole[]): CanActivateFn => {
       take(1),
       map(user => {
         if (!user) {
-          router.navigate(['/auth/login']);
+          router.navigate(['/Auth/login']);
           return false;
         }
 

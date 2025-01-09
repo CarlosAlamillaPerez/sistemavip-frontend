@@ -33,34 +33,39 @@ export class AuthService {
 
   login(email: string, password: string, rememberMe: boolean): Observable<LoginResponse> {
     const loginData: LoginRequest = {
-      email,
-      password,
-      rememberMe
+        email,
+        password,
+        rememberMe
     };
 
     return this.http.post<LoginResponse>(
-      `${environment.apiUrl}/auth/login`, 
-      loginData,
-      {
-        withCredentials: true, // Importante para permitir cookies
-        observe: 'response' as const
-      }
-    ).pipe(
-      map((response: HttpResponse<LoginResponse>) => {
-        if (response.body) {
-          this.currentUserSubject.next(response.body.user);
-          this.isAuthenticated.next(true);
-          this.alertService.success('¡Bienvenido al Sistema VIP!', 'Inicio de Sesión');
-          return response.body;
+        `${environment.apiUrl}/Auth/login`,  // Cambiamos 'auth' por 'Auth'
+        loginData,
+        {
+            withCredentials: true,
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            observe: 'response' as const
         }
-        throw new Error('Respuesta inválida del servidor');
-      })
+    ).pipe(
+        map((response: HttpResponse<LoginResponse>) => {
+            if (response.body) {
+                this.currentUserSubject.next(response.body.user);
+                this.isAuthenticated.next(true);
+                this.alertService.success('¡Bienvenido al Sistema VIP!', 'Inicio de Sesión');
+                return response.body;
+            }
+            throw new Error('Respuesta inválida del servidor');
+        })
     );
-  }
+}
+
 
   logout(): Observable<void> {
     return this.http.post<void>(
-      `${environment.apiUrl}/auth/logout`,
+      `${environment.apiUrl}/Auth/logout`,
       {},
       { withCredentials: true }
     ).pipe(
@@ -72,21 +77,28 @@ export class AuthService {
   }
 
   private checkAuthentication(): void {
-    // Verificar el estado de autenticación con el backend
-    this.http.get<User>(
-      `${environment.apiUrl}/auth/check`,
-      { withCredentials: true }
-    ).subscribe({
-      next: (user) => {
-        this.currentUserSubject.next(user);
-        this.isAuthenticated.next(true);
-      },
-      error: () => {
-        this.currentUserSubject.next(null);
-        this.isAuthenticated.next(false);
-      }
+    const url = `${environment.apiUrl}/Auth/check`;
+    
+    this.http.get<User>(url, { 
+        withCredentials: true,
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    }).subscribe({
+        next: (user) => {
+            this.currentUserSubject.next(user);
+            this.isAuthenticated.next(true);
+        },
+        error: (error) => {
+            this.currentUserSubject.next(null);
+            this.isAuthenticated.next(false);
+            if (error.status === 401) {
+
+            }
+        }
     });
-  }
+}
 
   getCurrentUser(): Observable<User | null> {
     return this.currentUserSubject.asObservable();

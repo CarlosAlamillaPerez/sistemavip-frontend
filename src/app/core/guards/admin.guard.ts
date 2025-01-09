@@ -51,7 +51,7 @@ export class AdminGuard implements CanActivate {
           'Acceso Denegado', 
           'No tiene permisos para acceder al panel de administración'
         );
-        this.router.navigate(['/auth/login']);
+        this.router.navigate(['/Auth/login']);
         return false;
       })
     );
