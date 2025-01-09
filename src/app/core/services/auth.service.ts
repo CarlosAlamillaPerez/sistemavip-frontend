@@ -39,45 +39,55 @@ export class AuthService {
     };
 
     return this.http.post<LoginResponse>(
-        `${environment.apiUrl}/Auth/login`,  // Cambiamos 'auth' por 'Auth'
-        loginData,
-        {
-            withCredentials: true,
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            observe: 'response' as const
-        }
-    ).pipe(
-        map((response: HttpResponse<LoginResponse>) => {
-            if (response.body) {
-                this.currentUserSubject.next(response.body.user);
-                this.isAuthenticated.next(true);
-                this.alertService.success('¡Bienvenido al Sistema VIP!', 'Inicio de Sesión');
-                return response.body;
-            }
-            throw new Error('Respuesta inválida del servidor');
-        })
-    );
+      `${environment.apiUrl}/Auth/login`,
+      loginData,
+      {
+          withCredentials: true,
+          headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+          },
+          observe: 'response' as const
+      }
+  ).pipe(
+      map((response: HttpResponse<LoginResponse>) => {
+          if (response.body) {
+              // Guardar en localStorage
+              localStorage.setItem('currentUser', JSON.stringify(response.body.user));
+              this.currentUserSubject.next(response.body.user);
+              this.isAuthenticated.next(true);
+              this.alertService.success('¡Bienvenido al Sistema VIP!', 'Inicio de Sesión');
+              return response.body;
+          }
+          throw new Error('Respuesta inválida del servidor');
+      })
+  );
 }
 
 
-  logout(): Observable<void> {
-    return this.http.post<void>(
+logout(): Observable<void> {
+  return this.http.post<void>(
       `${environment.apiUrl}/Auth/logout`,
       {},
       { withCredentials: true }
-    ).pipe(
+  ).pipe(
       tap(() => {
-        this.currentUserSubject.next(null);
-        this.isAuthenticated.next(false);
+          localStorage.removeItem('currentUser');
+          this.currentUserSubject.next(null);
+          this.isAuthenticated.next(false);
       })
-    );
-  }
+  );
+}
 
   private checkAuthentication(): void {
     const url = `${environment.apiUrl}/Auth/check`;
+
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+        const user = JSON.parse(storedUser);
+        this.currentUserSubject.next(user);
+        this.isAuthenticated.next(true);
+    }
     
     this.http.get<User>(url, { 
         withCredentials: true,
@@ -90,12 +100,9 @@ export class AuthService {
             this.currentUserSubject.next(user);
             this.isAuthenticated.next(true);
         },
-        error: (error) => {
+        error: () => {
             this.currentUserSubject.next(null);
             this.isAuthenticated.next(false);
-            if (error.status === 401) {
-
-            }
         }
     });
 }

@@ -32,14 +32,14 @@ export class AdminGuard implements CanActivate {
     return this.authService.getCurrentUserRole().pipe(
       map(role => {
         // Si requiere SUPER_ADMIN, solo permitir ese rol
-        if (requireSuperAdmin && role !== UserRole.SUPER_ADMIN) {
+        if (requireSuperAdmin && (role !== UserRole.SUPER_ADMIN && role !== UserRole.ADMIN)) {
           this.alertService.warning(
-            'Acceso Denegado', 
-            'No tiene permisos suficientes para acceder a esta sección'
+              'Acceso Denegado', 
+              'No tiene permisos suficientes para acceder a esta sección'
           );
-          this.router.navigate(['/admin/dashboard']);
+          this.router.navigate(['/admin/presentadores']);
           return false;
-        }
+      }
 
         // Para otras rutas admin, permitir tanto SUPER_ADMIN como ADMIN
         if (role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN) {

@@ -9,37 +9,17 @@ export const ADMIN_ROUTES: Routes = [
     component: AdminLayoutComponent,
     children: [
       {
-        path: 'dashboard',
-        loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
-      },
-      {
-        path: 'personal',
-        children: [
-          {
-            path: '',
-            loadComponent: () => import('../personal/personal.component').then(m => m.PersonalComponent)
-          },
-          {
-            path: 'presentadores',
-            loadChildren: () => import('../personal/presentadores/presentadores.routes')
-              .then(m => m.PRESENTADORES_ROUTES),
-            canActivate: [RoleGuard([UserRole.SUPER_ADMIN, UserRole.ADMIN])]
-          }
-        ]
-      },
-      {
-        path: 'comisiones',
-        loadComponent: () => import('../personal/comisiones/comisiones.component').then(m => m.ComisionesComponent)
-      },
-      {
-        path: 'reportes',
-        loadComponent: () => import('./reportes/reportes.component').then(m => m.ReportesComponent)
+        path: 'presentadores',
+        loadChildren: () => import('./personal/presentadores/pages/presentadores.routes')
+          .then(m => m.PRESENTADORES_ROUTES),
+        canActivate: [RoleGuard([UserRole.SUPER_ADMIN, UserRole.ADMIN])]
       },
       {
         path: '',
-        redirectTo: 'dashboard',
+        redirectTo: 'presentadores',
         pathMatch: 'full'
       }
     ]
   }
+
 ];

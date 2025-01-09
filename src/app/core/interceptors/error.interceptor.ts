@@ -11,11 +11,14 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      // Ignorar el error 404 específico del check de autenticación
+      if (error.status === 404 && req.url.includes('api/Auth/check')) {
+        return throwError(() => error);
+      }
+      
       errorHandler.handleError(error);
       
-      // Manejo especial para errores de autenticación
       if (error.status === 401) {
-        // Limpiar token y redirigir a login
         localStorage.removeItem('token');
         router.navigate(['/Auth/login']);
       }

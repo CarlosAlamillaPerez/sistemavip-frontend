@@ -2,9 +2,9 @@
 
 import { Routes } from '@angular/router';
 import { AdminGuard } from '@core/guards/admin.guard';
-import { ListaPresentadoresComponent } from './pages/lista-presentadores/lista-presentadores.component';
-import { DetallePresentadorComponent } from './pages/detalle-presentador/detalle-presentador.component';
-import { FormPresentadorComponent } from './pages/form-presentador/form-presentador.component';
+import { ListaPresentadoresComponent } from './lista-presentadores/lista-presentadores.component';
+import { DetallePresentadorComponent } from './detalle-presentador/detalle-presentador.component';
+import { FormPresentadorComponent } from './form-presentador/form-presentador.component';
 
 export const PRESENTADORES_ROUTES: Routes = [
   {

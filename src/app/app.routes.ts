@@ -24,7 +24,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'presentadores',
-        loadChildren: () => import('./features/personal/presentadores/presentadores.routes')
+        loadChildren: () => import('./features/admin/personal/presentadores/pages/presentadores.routes')
           .then(m => m.PRESENTADORES_ROUTES)
       },
       {
